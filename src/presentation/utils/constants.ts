@@ -1,5 +1,5 @@
-import { IUserType } from "@/data/interfaces/IUserType";
-import { IValues } from "@/data/interfaces/IValues";
+import { IUserType } from "@/domain/entities/IUserType";
+import { IValues } from "@/domain/entities/IValues";
 
 const SEX:IValues<string>[] =[
   {

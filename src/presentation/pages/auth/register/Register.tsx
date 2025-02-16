@@ -5,18 +5,33 @@ import {
   Stack,
   Button,
 } from "@mui/material";
-import { useFormikForm } from "@/hooks/useFormikValues";
-import { FormField } from "@/components/FormField";
-import { IRegister } from "@/data/interfaces/IRegister";
-import initialValues from "@/data/initialValues/registerValues";
-import validationSchema from "@/data/validations/RegisterValidation";
-import { FormCheckbox } from "@/components/Checkbox";
-import { InputSelect } from "@/components/InputSelect";
-import { SEX, USERS } from "@/utils/constants";
+import { useFormikForm } from "@/presentation/hooks/useFormikValues";
+import { FormField } from "@/presentation/components/FormField";
+import { IRegister } from "@/domain/entities/IRegister";
+import validationSchema from "@/domain/validation/RegisterValidation";
+import { FormCheckbox } from "@/presentation/components/Checkbox";
+import { InputSelect } from "@/presentation/components/InputSelect";
+import { SEX, USERS } from "@/presentation/utils/constants";
 
 
 export default function Register(){
   const onSubmit = (values:IRegister)=> console.log(values)
+  const initialValues:IRegister = {
+    nombre: "",
+    apellidoPaterno: "",
+    apellidoMaterno: "",
+    sexo: "",
+    tipoUsuario: 'passengers',
+    curp: "",
+    rfc: "",
+    fechaNacimiento: "",
+    correo: "",
+    contraseña: "",
+    confirmarContraseña: "",
+    terminos: false,
+  };
+
+
   const {
     values,
     handleBlur,
