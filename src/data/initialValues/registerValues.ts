@@ -1,10 +1,12 @@
-const initialValues = {
+import { IRegister } from "@/data/interfaces/IRegister";
+
+const initialValues:IRegister = {
   nombre: "",
   apellidoPaterno: "",
   apellidoMaterno: "",
   sexo: "",
   tipoUsuario: "",
-  crup: "",
+  curp: "",
   rfc: "",
   fechaNacimiento: "",
   correo: "",

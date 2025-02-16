@@ -1,0 +1,1 @@
+export type IUserType = 'passengers' | 'driver' | 'boss'

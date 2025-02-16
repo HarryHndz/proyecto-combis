@@ -1,6 +1,6 @@
 import { Box, TextField, Button, Typography, Link } from "@mui/material";
 
-export const Login = () => {
+export default function Login(){
   return (
     <Box
       sx={{

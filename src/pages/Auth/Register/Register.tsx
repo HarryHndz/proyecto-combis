@@ -1,15 +1,32 @@
 import {
   Box,
-  Button,
   Typography,
   Paper,
   Stack,
+  Button,
 } from "@mui/material";
-import { useRegisterForm } from "../../../hooks/register";
-import { FormField, FormCheckbox } from "../../../components/register";
+import { useFormikForm } from "@/hooks/useFormikValues";
+import { FormField } from "@/components/FormField";
+import { IRegister } from "@/data/interfaces/IRegister";
+import initialValues from "@/data/initialValues/registerValues";
+import validationSchema from "@/data/validations/RegisterValidation";
+import { FormCheckbox } from "@/components/Checkbox";
+import { InputSelect } from "@/components/InputSelect";
+import { SEX, USERS } from "@/utils/constants";
 
-export const Register = () => {
-  const { formik, tipoUsuario, setTipoUsuario } = useRegisterForm();
+
+export default function Register(){
+  const onSubmit = (values:IRegister)=> console.log(values)
+  const {
+    values,
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    errors,
+    touched,
+    setFieldValue,
+    isSubmitting
+  } = useFormikForm<IRegister>({initialValues,validationSchema,onSubmit})
 
   return (
     <Box
@@ -35,7 +52,7 @@ export const Register = () => {
             }}
           >
             <img
-              src="/../../../../public/Register.png"
+              src="@/public/Register.png"
               alt="Illustration"
               style={{ width: "100%", maxWidth: "300px" }}
             />
@@ -44,65 +61,128 @@ export const Register = () => {
             <Typography variant="h5" color="error" gutterBottom>
               Crear Cuenta
             </Typography>
-            <form onSubmit={formik.handleSubmit}>
-              <FormField field={{ label: "Nombre", name: "nombre" }} formik={formik} />
+            <form onSubmit={handleSubmit}>
+              <FormField  
+                label="Nombre"
+                value={values.nombre}
+                errorMessage={errors.nombre}
+                touched={touched.nombre}
+                onChange={handleChange('nombre')}
+                onBlur={handleBlur('nombre')}
+              />
               <Stack direction="row" spacing={2}>
-                <FormField field={{ label: "Apellido paterno", name: "apellidoPaterno" }} formik={formik} />
-                <FormField field={{ label: "Apellido materno", name: "apellidoMaterno" }} formik={formik} />
+                <FormField 
+                  label="Apellido paterno"
+                  value={values.apellidoPaterno}
+                  errorMessage={values.apellidoPaterno}
+                  touched={touched.apellidoPaterno}
+                  onChange={handleChange('apellidoPaterno')}
+                  onBlur={handleBlur('apellidoPaterno')}
+                />
+                <FormField 
+                  label="Apellido materno"
+                  value={values.apellidoMaterno}
+                  errorMessage={errors.apellidoMaterno}
+                  touched={touched.apellidoMaterno}
+                  onChange={handleChange('apellidoMaterno')}
+                  onBlur={handleBlur('apellidoMaterno')}
+                />
               </Stack>
-              <FormField
-                field={{ label: "Sexo", name: "sexo" }}
-                formik={formik}
-                selectOptions={[
-                  { value: "hombre", label: "Hombre" },
-                  { value: "mujer", label: "Mujer" },
-                ]}
+              <InputSelect
+                label="sexo"
+                data={SEX}
+                value={values.sexo}
+                handleChange={(e)=> setFieldValue('sexo',e.target.value)}
               />
               <FormField
-                field={{ label: "Fecha de nacimiento", name: "fechaNacimiento" }}
-                formik={formik}
                 type="date"
-                InputLabelProps={{ shrink: true }}
-              />
-              <FormField field={{ label: "Correo", name: "correo" }} formik={formik} />
-              <FormField field={{ label: "Contraseña", name: "contraseña" }} formik={formik} type="password" />
-              <FormField
-                field={{ label: "Confirmar contraseña", name: "confirmarContraseña" }}
-                formik={formik}
-                type="password"
-              />
-              <FormField
-                field={{ label: "Tipo de usuario", name: "tipoUsuario" }}
-                formik={formik}
-                selectOptions={[
-                  { value: "usuario", label: "Usuario Común" },
-                  { value: "chofer", label: "Chofer" },
-                  { value: "dueño", label: "Dueño" },
-                ]}
-                onChange={(e) => {
-                  formik.handleChange(e);
-                  setTipoUsuario(e.target.value);
+                label="Fecha nacimiento"
+                value={values.fechaNacimiento}
+                errorMessage={errors.fechaNacimiento}
+                onChange={handleChange('fechaNacimiento')}
+                onBlur={handleBlur('fechaNacimiento')}
+                slotProps={{
+                  inputLabel:{
+                    shrink:true
+                  }
                 }}
               />
-              {(tipoUsuario === "chofer" || tipoUsuario === "dueño") && (
-                <>
-                  <FormField field={{ label: "CRUP", name: "crup" }} formik={formik} />
-                  <FormField field={{ label: "RFC", name: "rfc" }} formik={formik} />
-                </>
-              )}
+              <FormField  
+                label="Correo"
+                value={values.correo}
+                errorMessage={errors.correo}
+                touched={touched.correo}
+                onChange={handleChange('correo')}
+                onBlur={handleBlur('correo')}
+              />
+              <FormField 
+                label="Contraseña"
+                value={values.contraseña}
+                errorMessage={errors.contraseña}
+                touched={touched.contraseña}
+                onChange={handleChange('contraseña')}
+                onBlur={handleBlur('contraseña')}
+                type="password" 
+                />
+              <FormField
+                label="Confirmar contraseña"
+                value={values.confirmarContraseña}
+                errorMessage={errors.confirmarContraseña}
+                touched={touched.confirmarContraseña}
+                onChange={handleChange('confirmarContraseña')}
+                onBlur={handleBlur('confirmarContraseña')}
+                type="password"
+              />
+
+              <InputSelect
+                label="Tipo de usuario"
+                value={values.tipoUsuario}
+                data={USERS}
+                handleChange={(e)=>setFieldValue('tipoUsuario',e.target.value)}
+              />
+              {
+                values.tipoUsuario === 'driver' || values.tipoUsuario === 'boss' &&(
+                  <Box>
+                     <FormField
+                      label="Curp"
+                      value={values.curp ?? ''}
+                      errorMessage={errors.curp}
+                      onChange={handleChange('curp')}
+                      onBlur={handleBlur('curp')}
+                    />
+                    <FormField
+                      label="RFC"
+                      value={values.rfc}
+                      errorMessage={errors.rfc}
+                      onChange={handleChange('rfc')}
+                      onBlur={handleBlur('rfc')}
+                    />
+                  </Box>
+                )
+              
+              }
               <FormCheckbox
-                field={{ name: "terminos" }}
-                formik={formik}
+                checked={values.terminos}
                 label="Acepto los términos y condiciones"
+                handleChange={()=>setFieldValue('terminos',!values.terminos)}
               />
               <Typography color="error" variant="body2">
-                {formik.touched.terminos && formik.errors.terminos}
+                {touched.terminos && errors.terminos}
               </Typography>
               <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                <Button fullWidth variant="contained" color="error" type="submit">
+                <Button 
+                  fullWidth 
+                  variant="contained" 
+                  color="error" 
+                  type="submit">
                   Registrarse
                 </Button>
-                <Button fullWidth variant="outlined" color="error">
+                <Button 
+                  fullWidth 
+                  variant="outlined" 
+                  color="error"
+                  loading={isSubmitting}
+                >
                   Iniciar sesión
                 </Button>
               </Stack>
