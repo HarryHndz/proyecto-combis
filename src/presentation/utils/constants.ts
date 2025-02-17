@@ -28,7 +28,10 @@ const USERS:IValues<IUserType>[] = [
   },
 ]
 
+const URL_SERVER = 'http://localhost:300'
+
 export {
   USERS,
-  SEX
+  SEX,
+  URL_SERVER
 }

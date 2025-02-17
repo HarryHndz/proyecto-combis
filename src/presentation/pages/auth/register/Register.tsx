@@ -7,28 +7,27 @@ import {
 } from "@mui/material";
 import { useFormikForm } from "@/presentation/hooks/useFormikValues";
 import { FormField } from "@/presentation/components/FormField";
-import { IRegister } from "@/domain/entities/IRegister";
+import { IRegister } from "@/domain/entities/IAuth";
 import validationSchema from "@/domain/validation/RegisterValidation";
 import { FormCheckbox } from "@/presentation/components/Checkbox";
 import { InputSelect } from "@/presentation/components/InputSelect";
 import { SEX, USERS } from "@/presentation/utils/constants";
 
-
 export default function Register(){
   const onSubmit = (values:IRegister)=> console.log(values)
   const initialValues:IRegister = {
-    nombre: "",
-    apellidoPaterno: "",
-    apellidoMaterno: "",
-    sexo: "",
-    tipoUsuario: 'passengers',
+    name: "",
+    paternalSurName: "",
+    maternalSurName: "",
+    gender: "",
+    userType: 'passengers',
     curp: "",
     rfc: "",
-    fechaNacimiento: "",
-    correo: "",
-    contraseña: "",
-    confirmarContraseña: "",
-    terminos: false,
+    date: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    conditionsTerms: false,
   };
 
 
@@ -79,43 +78,43 @@ export default function Register(){
             <form onSubmit={handleSubmit}>
               <FormField  
                 label="Nombre"
-                value={values.nombre}
-                errorMessage={errors.nombre}
-                touched={touched.nombre}
-                onChange={handleChange('nombre')}
-                onBlur={handleBlur('nombre')}
+                value={values.name}
+                errorMessage={errors.name}
+                touched={touched.name}
+                onChange={handleChange('name')}
+                onBlur={handleBlur('name')}
               />
               <Stack direction="row" spacing={2}>
                 <FormField 
                   label="Apellido paterno"
-                  value={values.apellidoPaterno}
-                  errorMessage={values.apellidoPaterno}
-                  touched={touched.apellidoPaterno}
-                  onChange={handleChange('apellidoPaterno')}
-                  onBlur={handleBlur('apellidoPaterno')}
+                  value={values.paternalSurName}
+                  errorMessage={values.paternalSurName}
+                  touched={touched.paternalSurName}
+                  onChange={handleChange('paternalSurName')}
+                  onBlur={handleBlur('paternalSurName')}
                 />
                 <FormField 
                   label="Apellido materno"
-                  value={values.apellidoMaterno}
-                  errorMessage={errors.apellidoMaterno}
-                  touched={touched.apellidoMaterno}
-                  onChange={handleChange('apellidoMaterno')}
-                  onBlur={handleBlur('apellidoMaterno')}
+                  value={values.maternalSurName}
+                  errorMessage={errors.maternalSurName}
+                  touched={touched.maternalSurName}
+                  onChange={handleChange('maternalSurName')}
+                  onBlur={handleBlur('maternalSurName')}
                 />
               </Stack>
               <InputSelect
                 label="sexo"
                 data={SEX}
-                value={values.sexo}
-                handleChange={(e)=> setFieldValue('sexo',e.target.value)}
+                value={values.gender}
+                handleChange={(e)=> setFieldValue('gender',e.target.value)}
               />
               <FormField
                 type="date"
                 label="Fecha nacimiento"
-                value={values.fechaNacimiento}
-                errorMessage={errors.fechaNacimiento}
-                onChange={handleChange('fechaNacimiento')}
-                onBlur={handleBlur('fechaNacimiento')}
+                value={values.date}
+                errorMessage={errors.date}
+                onChange={handleChange('date')}
+                onBlur={handleBlur('date')}
                 slotProps={{
                   inputLabel:{
                     shrink:true
@@ -124,39 +123,39 @@ export default function Register(){
               />
               <FormField  
                 label="Correo"
-                value={values.correo}
-                errorMessage={errors.correo}
-                touched={touched.correo}
-                onChange={handleChange('correo')}
-                onBlur={handleBlur('correo')}
+                value={values.email}
+                errorMessage={errors.email}
+                touched={touched.email}
+                onChange={handleChange('email')}
+                onBlur={handleBlur('email')}
               />
               <FormField 
                 label="Contraseña"
-                value={values.contraseña}
-                errorMessage={errors.contraseña}
-                touched={touched.contraseña}
-                onChange={handleChange('contraseña')}
-                onBlur={handleBlur('contraseña')}
+                value={values.password}
+                errorMessage={errors.password}
+                touched={touched.password}
+                onChange={handleChange('password')}
+                onBlur={handleBlur('password')}
                 type="password" 
                 />
               <FormField
                 label="Confirmar contraseña"
-                value={values.confirmarContraseña}
-                errorMessage={errors.confirmarContraseña}
-                touched={touched.confirmarContraseña}
-                onChange={handleChange('confirmarContraseña')}
-                onBlur={handleBlur('confirmarContraseña')}
+                value={values.confirmPassword}
+                errorMessage={errors.confirmPassword}
+                touched={touched.confirmPassword}
+                onChange={handleChange('confirmPassword')}
+                onBlur={handleBlur('confirmPassword')}
                 type="password"
               />
 
               <InputSelect
                 label="Tipo de usuario"
-                value={values.tipoUsuario}
+                value={values.userType}
                 data={USERS}
-                handleChange={(e)=>setFieldValue('tipoUsuario',e.target.value)}
+                handleChange={(e)=>setFieldValue('userType',e.target.value)}
               />
               {
-                values.tipoUsuario === 'driver' || values.tipoUsuario === 'boss' &&(
+                values.userType === 'driver' || values.userType === 'boss' &&(
                   <Box>
                      <FormField
                       label="Curp"
@@ -177,12 +176,12 @@ export default function Register(){
               
               }
               <FormCheckbox
-                checked={values.terminos}
+                checked={values.conditionsTerms}
                 label="Acepto los términos y condiciones"
-                handleChange={()=>setFieldValue('terminos',!values.terminos)}
+                handleChange={()=>setFieldValue('conditionsTerms',!values.conditionsTerms)}
               />
               <Typography color="error" variant="body2">
-                {touched.terminos && errors.terminos}
+                {touched.conditionsTerms && errors.conditionsTerms}
               </Typography>
               <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
                 <Button 
