@@ -8,7 +8,7 @@ import { IValues } from '@/domain/entities/IValues';
 
 interface PropsInputSelect{
   value:string
-  data:IValues[]
+  data:IValues<string>[]
   label:string
   handleChange:(event:SelectChangeEvent)=>void
 }
@@ -18,7 +18,7 @@ export const InputSelect=({value,handleChange,label,data}:PropsInputSelect)=> {
   return (
     <Box sx={{ minWidth: 120 }}>
       <FormControl fullWidth>
-        <InputLabel id="demo-simple-select-label">Age</InputLabel>
+        <InputLabel id="demo-simple-select-label">{label}</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"

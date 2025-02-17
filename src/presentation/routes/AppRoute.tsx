@@ -1,8 +1,8 @@
 import { BrowserRouter, Route, Routes } from "react-router";
-import Login  from "@/pages/auth/login/Login";
-import Register from "@/pages/auth/register/Register";
-import Profile from "@/pages/profile/Profile";
-import Home from "@/pages/home/Home";
+import Login  from "@/presentation/pages/auth/login/Login";
+import Register from "@/presentation/pages/auth/register/Register";
+import Profile from "@/presentation/pages/profile/Profile";
+import Home from "@/presentation/pages/home/Home";
 
 
 

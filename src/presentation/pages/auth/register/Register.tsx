@@ -39,7 +39,7 @@ export default function Register(){
     errors,
     touched,
     setFieldValue,
-    isSubmitting
+    
   } = useFormikForm<IRegister>({initialValues,validationSchema,onSubmit})
 
   return (
@@ -88,7 +88,7 @@ export default function Register(){
                 <FormField 
                   label="Apellido paterno"
                   value={values.paternalSurName}
-                  errorMessage={values.paternalSurName}
+                  errorMessage={errors.paternalSurName}
                   touched={touched.paternalSurName}
                   onChange={handleChange('paternalSurName')}
                   onBlur={handleBlur('paternalSurName')}
@@ -155,11 +155,11 @@ export default function Register(){
                 handleChange={(e)=>setFieldValue('userType',e.target.value)}
               />
               {
-                values.userType === 'driver' || values.userType === 'boss' &&(
+                (values.userType === 'driver' || values.userType === 'boss') &&(
                   <Box>
                      <FormField
                       label="Curp"
-                      value={values.curp ?? ''}
+                      value={values.curp}
                       errorMessage={errors.curp}
                       onChange={handleChange('curp')}
                       onBlur={handleBlur('curp')}
@@ -173,7 +173,6 @@ export default function Register(){
                     />
                   </Box>
                 )
-              
               }
               <FormCheckbox
                 checked={values.conditionsTerms}
@@ -184,6 +183,8 @@ export default function Register(){
                 {touched.conditionsTerms && errors.conditionsTerms}
               </Typography>
               <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                {JSON.stringify(errors)}
+                {values.gender}
                 <Button 
                   fullWidth 
                   variant="contained" 
@@ -191,14 +192,14 @@ export default function Register(){
                   type="submit">
                   Registrarse
                 </Button>
-                <Button 
+                {/* <Button 
                   fullWidth 
                   variant="outlined" 
                   color="error"
                   loading={isSubmitting}
                 >
                   Iniciar sesión
-                </Button>
+                </Button> */}
               </Stack>
             </form>
           </Box>
