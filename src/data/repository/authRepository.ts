@@ -10,18 +10,19 @@ export class AuthRepository implements AuthInterface{
   async register(dataRegister: IRegister): Promise<void> {
     try {
       await this.httpClient.post('/usuarios',{
-        correo:dataRegister.email,
-        contrasena:dataRegister.password,
-        id_tipo_usuario:dataRegister.userType,
-        persona:{
-          nombre:dataRegister.name,
-          apellido_pat:dataRegister.paternalSurName,
-          apellido_mat:dataRegister.maternalSurName,
-          sexo:dataRegister.gender,
-          fecha_nac:dataRegister.date,
-          curp:dataRegister.curp,
-          rfc:dataRegister.rfc
-        },
+        usuario: dataRegister.username,
+        contrasena: dataRegister.password,
+        correo: dataRegister.email,
+        id_tipo_usuario: 1,
+        persona: {
+          nombre: dataRegister.name,
+          apellido_pat: dataRegister.paternalSurName,
+          apellido_mat: dataRegister.maternalSurName,
+          sexo: 1,
+          fecha_nac: dataRegister.date,
+          curp: dataRegister.curp,
+          rfc: dataRegister.rfc
+        }
       })
     } catch (error) {
       throw error
@@ -29,12 +30,12 @@ export class AuthRepository implements AuthInterface{
   }
   async login(dataSession: ISession): Promise<IUser> {
     try {
-      const {data} = await this.httpClient.post('/usuarios',{
+      const {data} = await this.httpClient.post('/auth/login',{
         usuario:dataSession.username,
         contrasena:dataSession.password
       })
       const response:IUser ={
-        username:data.data.correo,
+        username:data.correo,
         id:data.usuario.id,
         idTypeUser:data.usuario.tipo_usuario.id,
         token:data.access_token 

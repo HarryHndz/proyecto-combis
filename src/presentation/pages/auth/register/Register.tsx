@@ -113,6 +113,14 @@ export default function Register(){
                   onBlur={handleBlur('maternalSurName')}
                 />
               </Stack>
+              <FormField  
+                label="Usuario"
+                value={values.username}
+                errorMessage={errors.username}
+                touched={touched.username}
+                onChange={handleChange('username')}
+                onBlur={handleBlur('username')}
+              />
               <InputSelect
                 label="sexo"
                 data={SEX}
