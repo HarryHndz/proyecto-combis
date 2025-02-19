@@ -1,6 +1,37 @@
-import { Box, TextField, Button, Typography, Link } from "@mui/material";
-
+import { AuthRepository } from "@/data/repository/authRepository";
+import { ISession } from "@/domain/entities/IAuth";
+import { AuthUseCases } from "@/domain/useCases/authUseCases";
+import { useFormikForm } from "@/presentation/hooks/useFormikValues";
+import { Box, Button, Typography, Link } from "@mui/material";
+import validationSchema from "@/domain/validation/loginValidation";
+import { FormField } from "@/presentation/components/FormField";
+import { useNavigate } from "react-router-dom";
 export default function Login(){
+  const initialValues:ISession ={
+    username:"",
+    password:""
+  }
+  const navigate = useNavigate()
+  const authRepository = new AuthUseCases(new AuthRepository())
+  const onSubmit = async(values:ISession)=>{
+    try {
+      const response = await authRepository.login(values)
+      console.log(response)
+      navigate('/')
+    } catch (error) {
+      console.log(error)
+      
+    }
+  }
+  const {
+    handleBlur,
+    handleChange,
+    handleSubmit,
+    isSubmitting,
+    values,
+    errors,
+    touched,
+  } = useFormikForm<ISession>({initialValues,validationSchema,onSubmit})
   return (
     <Box
       sx={{
@@ -27,32 +58,34 @@ export default function Login(){
         <Typography variant="h4" color="#000000" align="center" gutterBottom>
           Iniciar sesión
         </Typography>
-
-        <TextField
-          fullWidth
-          label="Correo"
-          variant="outlined"
-          margin="normal"
-          type="email"
-        />
-
-        <TextField
-          fullWidth
-          label="Contraseña"
-          variant="outlined"
-          margin="normal"
-          type="password"
-        />
-
-        <Button
-          fullWidth
-          variant="contained"
-          color="error"
-          sx={{ mt: 3, mb: 2 }}
-        >
-          Ingresar
-        </Button>
-
+        <form onSubmit={handleSubmit}>
+          <FormField 
+            value={values.username}
+            label="Usuario"
+            errorMessage={errors.username}
+            touched={touched.username}
+            onChange={handleChange('username')}
+            onBlur={handleBlur('username')}
+          />
+           <FormField 
+            value={values.password}
+            label="Contraseña"
+            errorMessage={errors.password}
+            touched={touched.password}
+            onChange={handleChange('password')}
+            onBlur={handleBlur('password')}
+          />
+          <Button
+            fullWidth
+            variant="contained"
+            color="error"
+            type="submit"
+            loading={isSubmitting}
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Ingresar
+          </Button>
+        </form>
         <Box
           sx={{
             display: "flex",

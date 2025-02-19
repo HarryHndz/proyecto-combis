@@ -12,9 +12,11 @@ import validationSchema from "@/domain/validation/RegisterValidation";
 import { FormCheckbox } from "@/presentation/components/Checkbox";
 import { InputSelect } from "@/presentation/components/InputSelect";
 import { SEX, USERS } from "@/presentation/utils/constants";
-
+import { AuthRepository } from "@/data/repository/authRepository";
+import { AuthUseCases } from "@/domain/useCases/authUseCases";
+import {useNavigate} from 'react-router-dom'
 export default function Register(){
-  const onSubmit = (values:IRegister)=> console.log(values)
+  const authRepository = new AuthUseCases(new AuthRepository())
   const initialValues:IRegister = {
     name: "",
     paternalSurName: "",
@@ -27,10 +29,17 @@ export default function Register(){
     email: "",
     password: "",
     confirmPassword: "",
+    username:"",
     conditionsTerms: false,
-  };
-
-
+  }
+  const  navigate = useNavigate()
+  const onSubmit = async(values:IRegister)=>{
+    try {
+      await authRepository.register(values)
+    } catch (error) {
+      console.log(error);
+    }
+  }
   const {
     values,
     handleBlur,
@@ -39,9 +48,11 @@ export default function Register(){
     errors,
     touched,
     setFieldValue,
-    
+    isSubmitting,
   } = useFormikForm<IRegister>({initialValues,validationSchema,onSubmit})
 
+  const handleNavigateToLogin=()=> navigate('/login') 
+ 
   return (
     <Box
       sx={{
@@ -183,23 +194,23 @@ export default function Register(){
                 {touched.conditionsTerms && errors.conditionsTerms}
               </Typography>
               <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
-                {JSON.stringify(errors)}
-                {values.gender}
                 <Button 
                   fullWidth 
                   variant="contained" 
                   color="error" 
-                  type="submit">
+                  type="submit"
+                  loading={isSubmitting}
+                  >
                   Registrarse
                 </Button>
-                {/* <Button 
+                <Button 
                   fullWidth 
                   variant="outlined" 
                   color="error"
-                  loading={isSubmitting}
+                  onClick={handleNavigateToLogin}
                 >
                   Iniciar sesión
-                </Button> */}
+                </Button>
               </Stack>
             </form>
           </Box>

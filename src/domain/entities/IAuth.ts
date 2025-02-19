@@ -1,6 +1,7 @@
 import { IUserType } from "./IUserType";
 
 export interface IRegister {
+  username:string,
   name: string
   paternalSurName: string
   maternalSurName: string
@@ -15,11 +16,13 @@ export interface IRegister {
   conditionsTerms: boolean
 }
 
-export interface IUser extends Omit<IRegister,'conditionsTerms'>{
-  key:number
+export interface IUser extends Pick<IRegister,'username'>{
+  id:number
   token:string
+  idTypeUser:number
+
 }
 
-export type ISession = Pick<IRegister,'email' | 'password'>
+export type ISession = Pick<IRegister,'username' | 'password'>
 
 

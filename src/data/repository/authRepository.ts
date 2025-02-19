@@ -1,7 +1,6 @@
 import { AuthInterface } from "@/domain/repository/authInterface";
-import { IRegister, ISession } from "@/domain/entities/IAuth";
+import { IRegister, ISession, IUser } from "@/domain/entities/IAuth";
 import { ApiClient } from "@/data/apiClient";
-import { IResponse } from "@/domain/entities/IResponse";
 
 export class AuthRepository implements AuthInterface{
   private httpClient
@@ -10,16 +9,16 @@ export class AuthRepository implements AuthInterface{
   }
   async register(dataRegister: IRegister): Promise<void> {
     try {
-      await this.httpClient.post('/register',{
+      await this.httpClient.post('/usuarios',{
         correo:dataRegister.email,
         contrasena:dataRegister.password,
-        tipo_usuario:dataRegister.userType,
+        id_tipo_usuario:dataRegister.userType,
         persona:{
           nombre:dataRegister.name,
           apellido_pat:dataRegister.paternalSurName,
           apellido_mat:dataRegister.maternalSurName,
           sexo:dataRegister.gender,
-          fecha_nacimiento:dataRegister.date,
+          fecha_nac:dataRegister.date,
           curp:dataRegister.curp,
           rfc:dataRegister.rfc
         },
@@ -28,15 +27,17 @@ export class AuthRepository implements AuthInterface{
       throw error
     }
   }
-  async login(dataSession: ISession): Promise<ISession> {
+  async login(dataSession: ISession): Promise<IUser> {
     try {
-      const {data} = await this.httpClient.post<IResponse>('/login',{
-        correo:dataSession.email,
+      const {data} = await this.httpClient.post('/usuarios',{
+        usuario:dataSession.username,
         contrasena:dataSession.password
       })
-      const response:ISession ={
-        email:data.data.correo,
-        password:data.data.passoword
+      const response:IUser ={
+        username:data.data.correo,
+        id:data.usuario.id,
+        idTypeUser:data.usuario.tipo_usuario.id,
+        token:data.access_token 
       } 
       return response
     } catch (error) {

@@ -28,7 +28,7 @@ const USERS:IValues<IUserType>[] = [
   },
 ]
 
-const URL_SERVER = 'http://localhost:300'
+const URL_SERVER = 'http://192.168.1.74:300'
 
 export {
   USERS,
