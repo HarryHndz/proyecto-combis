@@ -14,14 +14,14 @@ const NAVIGATION: Navigation = [
     icon: <HomeIcon />,
   },
   {
-    segment: 'logout',
-    title: 'Cerrar Sesión',
-    icon: <ExitToAppIcon />,
-  },
-  {
     segment: 'account',
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
+  },
+  {
+    segment: 'logout',
+    title: 'Cerrar Sesión',
+    icon: <ExitToAppIcon />,
   },
 ];
 

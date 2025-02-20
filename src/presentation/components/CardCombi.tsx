@@ -16,7 +16,7 @@ return (
     <CardContent>
         <Box display="flex" alignItems="center">
             <DirectionsBusIcon color="primary" style={{ marginRight: '8px' }} />
-            <Typography variant="body2">Autobús</Typography>
+            <Typography variant="body2">Parrilla-Mercedes</Typography>
         </Box>
 
         <Box display="flex" alignItems="center" style={{ marginTop: '10px' }}>
