@@ -1,11 +1,13 @@
 import { AuthRepository } from "@/data/repository/authRepository";
-import { ISession } from "@/domain/entities/IAuth";
+import { ISession, IUser } from "@/domain/entities/IAuth";
 import { AuthUseCases } from "@/domain/useCases/authUseCases";
 import { useFormikForm } from "@/presentation/hooks/useFormikValues";
 import { Box, Button, Typography, Link } from "@mui/material";
 import validationSchema from "@/domain/validation/loginValidation";
 import { FormField } from "@/presentation/components/FormField";
 import { useNavigate } from "react-router-dom";
+import { LocalStoreRepository } from "@/data/repository/localRepository";
+import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
 export default function Login(){
   const initialValues:ISession ={
     username:"",
@@ -13,11 +15,12 @@ export default function Login(){
   }
   const navigate = useNavigate()
   const authRepository = new AuthUseCases(new AuthRepository())
+  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository())
   const onSubmit = async(values:ISession)=>{
     try {
       const response = await authRepository.login(values)
-      console.log(response)
-      navigate('/')
+      localRepository.save(response.id,response)
+      navigate('/home')
     } catch (error) {
       console.log(error)
       

@@ -9,7 +9,7 @@ export class LocalStoreRepository<T> implements LocalStoreInterface<T>{
     return data ? JSON.parse(data):null
   }
   remove(key: number): void {
-    
+    localStorage.removeItem(key.toString())
   }
   
 }
