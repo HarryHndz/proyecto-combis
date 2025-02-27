@@ -2,16 +2,23 @@ import { createTheme } from '@mui/material/styles';
 import HomeIcon from '@mui/icons-material/Home';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
+import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Ícono de transporte
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+
 const NAVIGATION: Navigation = [
   {
     segment: 'home',
     title: 'Inicioooo',
     icon: <HomeIcon />,
+  },
+  {
+    segment: 'transport',
+    title: 'Transporte',
+    icon: <DirectionsBusIcon />, // Nuevo ícono agregado
   },
   {
     segment: 'account',
@@ -53,7 +60,7 @@ export default function DashboardLayoutScreen(props: DemoProps) {
       navigation={NAVIGATION} 
       window={demoWindow}
       theme={demoTheme}
-      >
+    >
       <DashboardLayout>
         <PageContainer>
           <Outlet />
@@ -62,4 +69,3 @@ export default function DashboardLayoutScreen(props: DemoProps) {
     </ReactRouterAppProvider>
   );
 }
-
