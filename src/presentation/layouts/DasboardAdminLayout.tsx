@@ -1,27 +1,40 @@
 import { createTheme } from '@mui/material/styles';
-import HomeIcon from '@mui/icons-material/Home';
-import ExitToAppIcon from '@mui/icons-material/ExitToApp';
+// import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
+import RouteIcon from '@mui/icons-material/Route';
+import PlaceIcon from '@mui/icons-material/Place';
+import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
 const NAVIGATION: Navigation = [
   {
-    segment: 'home',
-    title: 'Inicioooo',
-    icon: <HomeIcon />,
+    segment: 'car',
+    title: 'Combis',
+    icon: <DirectionsCarIcon />,
+  },
+  {
+    segment: 'route',
+    title: 'Rutas',
+    icon: <RouteIcon />,
+  },
+  {
+    segment: 'place',
+    title: 'Paradas',
+    icon: <PlaceIcon />,
+  },
+  {
+    segment: 'driver',
+    title: 'Choferes',
+    icon: <AirlineSeatReclineNormalIcon />,
   },
   {
     segment: 'account',
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
-  },
-  {
-    segment: 'logout',
-    title: 'Cerrar Sesión',
-    icon: <ExitToAppIcon />,
   },
 ];
 
@@ -45,7 +58,7 @@ interface DemoProps {
   window?: () => Window;
 }
 
-export default function DashboardLayoutScreen(props: DemoProps) {
+export default function DashboardUserLayout(props: DemoProps) {
   const { window } = props;
   const demoWindow = window !== undefined ? window() : undefined;
   return (
@@ -62,4 +75,5 @@ export default function DashboardLayoutScreen(props: DemoProps) {
     </ReactRouterAppProvider>
   );
 }
+
 
