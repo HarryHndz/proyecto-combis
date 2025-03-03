@@ -8,6 +8,11 @@ import DashboardUserLayout from "@/presentation/layouts/DashboardUserLayout";
 import DasboardAdminLayout from "@/presentation/layouts/DasboardAdminLayout";
 import Places from "@/presentation/pages/admin/place/index";
 import AddPlace from "@/presentation/pages/admin/place/add";
+import Drivers from "@/presentation/pages/admin/drivers/index";
+import AddDriver from "../pages/admin/drivers/add";
+import UpdateDriver from "../pages/admin/drivers/update";
+import DetailsDriver from "../pages/admin/drivers/detail";
+
 const Router = () => {
   return (
     <BrowserRouter>
@@ -20,6 +25,12 @@ const Router = () => {
         <Route path="admin" element={<DasboardAdminLayout />}>
           <Route path="places" index element={<Places />} />
           <Route path="add" index element={<AddPlace />} />
+          <Route path="drivers">
+            <Route index element={<Drivers />} />
+            <Route path="new" index element={<AddDriver />} />
+            <Route path="modify/:id" index element={<UpdateDriver />} />
+            <Route path="details/:id" index element={<DetailsDriver />} />
+          </Route>
         </Route>
         <Route path="auth">
           <Route path="register" element={<Register />} />

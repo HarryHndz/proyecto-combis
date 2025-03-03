@@ -4,7 +4,6 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import RouteIcon from '@mui/icons-material/Route';
@@ -27,7 +26,7 @@ const NAVIGATION: Navigation = [
     icon: <PlaceIcon />,
   },
   {
-    segment: 'driver',
+    segment: 'admin/drivers',
     title: 'Choferes',
     icon: <AirlineSeatReclineNormalIcon />,
   },
@@ -68,9 +67,7 @@ export default function DashboardUserLayout(props: DemoProps) {
       theme={demoTheme}
       >
       <DashboardLayout>
-        <PageContainer>
           <Outlet />
-        </PageContainer>
       </DashboardLayout>
     </ReactRouterAppProvider>
   );
