@@ -1,5 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import Login  from "@/presentation/pages/auth/login/Login";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "@/presentation/pages/auth/login/Login";
 import Register from "@/presentation/pages/auth/register/Register";
 import Profile from "@/presentation/pages/user/profile/Profile";
 import Home from "@/presentation/pages/user/home/Home";
@@ -12,6 +12,9 @@ import Drivers from "@/presentation/pages/admin/drivers/index";
 import AddDriver from "../pages/admin/drivers/add";
 import UpdateDriver from "../pages/admin/drivers/update";
 import DetailsDriver from "../pages/admin/drivers/detail";
+import Transport from "@/presentation/pages/transport/Transport";
+import RegisterCombis from "@/presentation/pages/transport/Register/RegisterCombis";
+import UpdateCombis from "@/presentation/pages/transport/update/update";
 
 const Router = () => {
   return (
@@ -21,15 +24,20 @@ const Router = () => {
           <Route path="home" index element={<Home />} />
           <Route path="account" element={<Account />} />
           <Route path="profile" element={<Profile />} />
+          <Route path="transport" element={<Transport />} />
         </Route>
         <Route path="admin" element={<DasboardAdminLayout />}>
           <Route path="places" index element={<Places />} />
           <Route path="add" index element={<AddPlace />} />
+          <Route path="transport/register" element={<RegisterCombis />} />
+          <Route path="transport/update" element={<UpdateCombis />} />
           <Route path="drivers">
             <Route index element={<Drivers />} />
             <Route path="new" index element={<AddDriver />} />
             <Route path="modify/:id" index element={<UpdateDriver />} />
             <Route path="details/:id" index element={<DetailsDriver />} />
+          </Route>
+          <Route path="transport" element={<Transport />}>
           </Route>
         </Route>
         <Route path="auth">
@@ -38,7 +46,7 @@ const Router = () => {
         </Route>
       </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};
 
 export default Router;
