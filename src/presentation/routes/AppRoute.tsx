@@ -12,9 +12,9 @@ import Drivers from "@/presentation/pages/admin/drivers/index";
 import AddDriver from "../pages/admin/drivers/add";
 import UpdateDriver from "../pages/admin/drivers/update";
 import DetailsDriver from "../pages/admin/drivers/detail";
-import Transport from "@/presentation/pages/transport/Transport";
-import RegisterCombis from "@/presentation/pages/transport/Register/RegisterCombis";
-import UpdateCombis from "@/presentation/pages/transport/update/update";
+import Transport from "@/presentation/pages/admin/transport/Transport";
+import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
+import UpdateCombis from "@/presentation/pages/admin/transport/update";
 
 const Router = () => {
   return (
@@ -24,7 +24,6 @@ const Router = () => {
           <Route path="home" index element={<Home />} />
           <Route path="account" element={<Account />} />
           <Route path="profile" element={<Profile />} />
-          <Route path="transport" element={<Transport />} />
         </Route>
         <Route path="admin" element={<DasboardAdminLayout />}>
           <Route path="places" index element={<Places />} />
