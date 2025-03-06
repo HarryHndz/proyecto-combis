@@ -1,15 +1,16 @@
 import { FormCheckbox } from "@/presentation/components/Checkbox";
 import { FormField } from "@/presentation/components/FormField";
-import { Box, Button, Container } from "@mui/material";
+import { Box, Button, Container, useTheme } from "@mui/material";
 
 
 export default function AddPlace() {
+  const theme = useTheme()
   return(
     <Container>
       <Box
         sx={{
           borderRadius:'10px',
-          backgroundColor:'blue',
+          backgroundColor:theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff",
           display:'flex',
           width:'100%',
           alignItems:'center',

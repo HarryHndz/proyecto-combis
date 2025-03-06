@@ -15,6 +15,7 @@ import DetailsDriver from "../pages/admin/drivers/detail";
 import Transport from "@/presentation/pages/admin/transport/Transport";
 import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
 import UpdateCombis from "@/presentation/pages/admin/transport/update";
+import RoutePlace from "../pages/admin/routes";
 
 const Router = () => {
   return (
@@ -26,18 +27,24 @@ const Router = () => {
           <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="admin" element={<DasboardAdminLayout />}>
-          <Route path="places" index element={<Places />} />
-          <Route path="add" index element={<AddPlace />} />
-          <Route path="transport/register" element={<RegisterCombis />} />
-          <Route path="transport/update" element={<UpdateCombis />} />
+          <Route path="places">
+            <Route index element={<Places />} />
+            <Route path="add" index element={<AddPlace />} />
+          </Route>
+          <Route path="transport">
+            <Route path="register" element={<RegisterCombis />} />
+            <Route path="update" element={<UpdateCombis />} />
+            <Route index element={<Transport />} />
+          </Route>
+          <Route path="route">
+            <Route index element={<RoutePlace />} />
+          </Route>
           <Route path="drivers">
             <Route index element={<Drivers />} />
             <Route path="new" index element={<AddDriver />} />
             <Route path="modify/:id" index element={<UpdateDriver />} />
             <Route path="details/:id" index element={<DetailsDriver />} />
-          </Route>
-          <Route path="transport" element={<Transport />}>
-          </Route>
+          </Route>          
         </Route>
         <Route path="auth">
           <Route path="register" element={<Register />} />

@@ -2,31 +2,24 @@ import { createTheme } from '@mui/material/styles';
 import HomeIcon from '@mui/icons-material/Home';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
-import DirectionsBusIcon from '@mui/icons-material/DirectionsBus'; // Ícono de transporte
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 
 const NAVIGATION: Navigation = [
   {
-    segment: 'home',
+    segment: 'user/home',
     title: 'Inicioooo',
     icon: <HomeIcon />,
   },
   {
-    segment: 'transport',
-    title: 'Transporte',
-    icon: <DirectionsBusIcon />, // Nuevo ícono agregado
-  },
-  {
-    segment: 'account',
+    segment: 'user/account',
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
   },
   {
-    segment: 'logout',
+    segment: 'user/profile',
     title: 'Cerrar Sesión',
     icon: <ExitToAppIcon />,
   },
@@ -62,9 +55,7 @@ export default function DashboardUserLayout(props: DemoProps) {
       theme={demoTheme}
     >
       <DashboardLayout>
-        <PageContainer>
-          <Outlet />
-        </PageContainer>
+        <Outlet />
       </DashboardLayout>
     </ReactRouterAppProvider>
   );
