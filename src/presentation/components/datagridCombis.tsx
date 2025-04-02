@@ -1,16 +1,19 @@
-import Box from '@mui/material/Box';
+import { Box, Chip, CircularProgress, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
-import Chip from '@mui/material/Chip';
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useVehiclesData } from '@/presentation/hooks/useVehiclesData'; 
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
 import MenuItem from '@mui/material/MenuItem';
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 
 const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const navigate = useNavigate(); 
+  const [openDialog, setOpenDialog] = useState(false);
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const navigate = useNavigate();
+  const { deleteVehicle, fetchVehicles } = useVehiclesData();
 
   const handleClick = (event: React.MouseEvent<HTMLElement>) => {
     setAnchorEl(event.currentTarget);
@@ -18,6 +21,21 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
 
   const handleClose = () => {
     setAnchorEl(null);
+  };
+
+  const handleDelete = async () => {
+    setLoadingDelete(true);
+    try {
+      await deleteVehicle(idVehiculo);
+      await fetchVehicles();
+      setOpenDialog(false);
+      console.log(`Vehículo ${idVehiculo} eliminado`);
+    } catch (error) {
+      setOpenDialog(false);
+      console.error("Error al eliminar el vehículo:", error);
+    } finally {
+      setLoadingDelete(false);
+    }
   };
 
   return (
@@ -30,12 +48,34 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
         <MenuItem onClick={() => { 
           handleClose(); 
           console.log(`Actualizar ${idVehiculo}`);
-          navigate('/transport/update'); 
+          navigate('/transport/update');
         }}>
           Actualizar
         </MenuItem>
-        <MenuItem onClick={() => { handleClose(); console.log(`Dar de baja ${idVehiculo}`); }}>Dar de baja</MenuItem>
+        <MenuItem onClick={() => { 
+          handleClose();
+          setOpenDialog(true);
+        }}>
+          Dar de baja
+        </MenuItem>
       </Menu>
+
+      <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
+        <DialogTitle>¿Estás seguro de eliminar este vehículo?</DialogTitle>
+        <DialogContent>
+          <Typography variant="body1" color="textSecondary">
+            Esta acción es irreversible. ¿Estás seguro de que deseas eliminar este vehículo?
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenDialog(false)} color="primary" disabled={loadingDelete}>
+            Cancelar
+          </Button>
+          <Button onClick={handleDelete} color="secondary" disabled={loadingDelete}>
+            {loadingDelete ? 'Eliminando...' : 'Eliminar'}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </>
   );
 };
@@ -68,32 +108,39 @@ const columns: GridColDef[] = [
   },
 ];
 
-const rows = [
-  { id: 1, idVehiculo: 'V001', numero: '12345', matricula: 'ABC-123', activo: true },
-  { id: 2, idVehiculo: 'V002', numero: '67890', matricula: 'XYZ-789', activo: true },
-  { id: 3, idVehiculo: 'V003', numero: '54321', matricula: 'LMN-456', activo: false },
-  { id: 4, idVehiculo: 'V004', numero: '98765', matricula: 'QRS-111', activo: true },
-  { id: 5, idVehiculo: 'V005', numero: '13579', matricula: 'TUV-222', activo: false },
-  { id: 6, idVehiculo: 'V006', numero: '24680', matricula: 'WXY-333', activo: true },
-  { id: 7, idVehiculo: 'V007', numero: '11223', matricula: 'ZZZ-444', activo: false },
-];
-
 export default function DataGridVehiculos() {
+  const { vehicles, loading, error } = useVehiclesData();  
+
+  if (loading) {
+    return (
+      <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+        <CircularProgress />
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Box sx={{ textAlign: 'center', padding: 2 }}>
+        <Typography variant="h6" color="error">
+          {error}
+        </Typography>
+      </Box>
+    );
+  }
+
   return (
     <Box sx={{ height: 500, width: '100%', display: 'flex', justifyContent: 'center' }}>
       <Box sx={{ width: '90%', maxWidth: 1100 }}>
         <DataGrid
-          rows={rows}
-          columns={columns}
+          rows={vehicles}  
+          columns={columns}  
           autoHeight
           initialState={{
             pagination: {
-              paginationModel: {
-                pageSize: 10,
-              },
+              paginationModel: { pageSize: 10 },
             },
           }}
-          pageSizeOptions={[5, 10]}
           checkboxSelection
           disableRowSelectionOnClick
         />
