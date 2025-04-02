@@ -5,7 +5,7 @@ import { VehicleRepository } from '@/data/repository/VehiclesRepository';
 import { IRegisterVehicle } from '@/domain/entities/IVehicles'; 
 import { Box, CircularProgress, Typography } from '@mui/material';
 import VehicleDetailsCard from '@/presentation/components/CarddetailsCombis'; 
-//cambios 
+//cambios ccc
 const DetailsCombis = () => {
   const { id } = useParams();
   const [vehicle, setVehicle] = useState<IRegisterVehicle | null>(null);
