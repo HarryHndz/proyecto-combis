@@ -7,7 +7,7 @@ const BotonAgregar: React.FC = () => {
     const navigate = useNavigate();
 
     return (
-        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('/transport/register')}>
+        <Button variant="contained" color="primary" startIcon={<AddIcon />} onClick={() => navigate('register')}>
             Agregar
         </Button>
     );

@@ -1,32 +1,54 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Login from "@/presentation/pages/auth/login/Login";
 import Register from "@/presentation/pages/auth/register/Register";
-import Profile from "@/presentation/pages/profile/Profile";
-import Home from "@/presentation/pages/home/Home";
-import DashboardLayoutScreen from "../pages/layout/Dashboard";
-import Account from "@/presentation/pages/account/Account";
-import Transport from "@/presentation/pages/transport/Transport";
-import RegisterCombis from "@/presentation/pages/transport/Register/RegisterCombis";
-import UpdateCombis from "@/presentation/pages/transport/update/update";
+import Profile from "@/presentation/pages/user/profile/Profile";
+import Home from "@/presentation/pages/user/home/Home";
+import Account from "@/presentation/pages/user/account/Account";
+import DashboardUserLayout from "@/presentation/layouts/DashboardUserLayout";
+import DasboardAdminLayout from "@/presentation/layouts/DasboardAdminLayout";
+import Places from "@/presentation/pages/admin/place/index";
+import AddPlace from "@/presentation/pages/admin/place/add";
+import Drivers from "@/presentation/pages/admin/drivers/index";
+import AddDriver from "../pages/admin/drivers/add";
+import UpdateDriver from "../pages/admin/drivers/update";
+import DetailsDriver from "../pages/admin/drivers/detail";
+import Transport from "@/presentation/pages/admin/transport/Transport";
+import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
+import UpdateCombis from "@/presentation/pages/admin/transport/update";
+import RoutePlace from "../pages/admin/routes";
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/" element={<DashboardLayoutScreen />}>
+        <Route path="user" element={<DashboardUserLayout />}>
           <Route path="home" index element={<Home />} />
           <Route path="account" element={<Account />} />
-          <Route path="transport" element={<Transport />}>
-          </Route>
-          
-        <Route path="transport/register" element={<RegisterCombis />} />
-        <Route path="transport/update" element={<UpdateCombis />} />
-
+          <Route path="profile" element={<Profile />} />
         </Route>
-        <Route path="profile" element={<Profile />} />
+        <Route path="admin" element={<DasboardAdminLayout />}>
+          <Route path="places">
+            <Route index element={<Places />} />
+            <Route path="add" index element={<AddPlace />} />
+          </Route>
+          <Route path="transport">
+            <Route path="register" element={<RegisterCombis />} />
+            <Route path="update" element={<UpdateCombis />} />
+            <Route index element={<Transport />} />
+          </Route>
+          <Route path="route">
+            <Route index element={<RoutePlace />} />
+          </Route>
+          <Route path="drivers">
+            <Route index element={<Drivers />} />
+            <Route path="new" index element={<AddDriver />} />
+            <Route path="modify/:id" index element={<UpdateDriver />} />
+            <Route path="details/:id" index element={<DetailsDriver />} />
+          </Route>          
+        </Route>
         <Route path="auth">
           <Route path="register" element={<Register />} />
-          <Route path="login" element={<Login />} />
+          <Route index path="login" element={<Login />} />
         </Route>
       </Routes>
     </BrowserRouter>
