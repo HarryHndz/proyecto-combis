@@ -1,29 +1,54 @@
-import React, { useState } from "react";
-import { Grid, Box, Button, Typography, useTheme } from "@mui/material";
+import { Box, Button, Typography, useTheme, Stack } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { FormField } from "@/presentation/components/FormField";
 import ImageUpload from "@/presentation/components/imagenUpload";
-
+import { useVehicleFormikForm } from "@/presentation/hooks/useFormikCombis";
+import validationSchema from "@/domain/validation/VehiclesValidation"; 
+import { IRegisterVehicle } from "@/domain/entities/IVehicles"; 
+import { VehicleUseCases } from "@/domain/useCases/vehiclesUseCases"; 
+import { VehicleRepository } from "@/data/repository/VehiclesRepository"; 
 const VehicleForm = () => {
   const theme = useTheme();
   const navigate = useNavigate();
 
-  const [formData, setFormData] = useState({
+
+  const vehicleRepository = new VehicleRepository();
+  const vehicleUseCases = new VehicleUseCases(vehicleRepository);
+
+  const initialValues: IRegisterVehicle = {
+    id: "",
     numero: "",
     matricula: "",
+    image: null,
+  };
+
+  const handleSubmit = async (values: IRegisterVehicle) => {
+    try {
+      await vehicleUseCases.registerVehicle(values);
+      console.log("Combi registrada:", values);
+    } catch (error) {
+      console.error("Error al registrar la combi:", error);
+    }
+  };
+
+  
+  const {
+    values,
+    errors,
+    handleBlur,
+    handleChange,
+    handleSubmit: formikSubmit,
+    isSubmitting,
+    touched,
+    setFieldValue,
+  } = useVehicleFormikForm({
+    initialValues,
+    validationSchema,
+    onSubmit: handleSubmit,
   });
 
-  const handleChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    console.log("Valores del formulario:", formData);
-  };
-
   const handleCancel = () => {
-    navigate(-1); 
+    navigate(-1);
   };
 
   return (
@@ -38,39 +63,47 @@ const VehicleForm = () => {
       }}
     >
       <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-        Registro de Vehículo
+        Registro de Combi
       </Typography>
 
-      <form onSubmit={handleSubmit}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
-            <ImageUpload />
-          </Grid>
+      <form onSubmit={formikSubmit}>
+        <Stack direction={{ xs: "column", md: "row" }} spacing={2} alignItems="center">
+          <Box flex={{ xs: "none", md: 1 }}>
+            <ImageUpload
+              onImageChange={(image: File | null) => setFieldValue("image", image)}
+            />
+          </Box>
 
-          <Grid item xs={12} md={8}>
+          <Box flex={{ xs: "none", md: 2 }}>
             <FormField
               name="numero"
               label="Número"
-              value={formData.numero}
-              onChange={(e) => handleChange("numero", e.target.value)}
+              value={values.numero}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.numero && Boolean(errors.numero)}
+              helperText={touched.numero && errors.numero}
             />
             <FormField
               name="matricula"
               label="Matrícula"
-              value={formData.matricula}
-              onChange={(e) => handleChange("matricula", e.target.value)}
+              value={values.matricula}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              error={touched.matricula && Boolean(errors.matricula)}
+              helperText={touched.matricula && errors.matricula}
             />
 
             <Box mt={3} display="flex" justifyContent="space-between">
               <Button variant="outlined" color="secondary" onClick={handleCancel}>
                 Cancelar
               </Button>
-              <Button type="submit" variant="contained" color="primary">
+              <Button type="submit" variant="contained" color="primary" disabled={isSubmitting}>
                 Enviar
               </Button>
             </Box>
-          </Grid>
-        </Grid>
+          </Box>
+        </Stack>
       </form>
     </Box>
   );
