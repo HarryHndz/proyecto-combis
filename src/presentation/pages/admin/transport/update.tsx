@@ -1,30 +1,76 @@
-import React, { useState } from "react";
-import { Grid, Box, Button, Typography, useTheme } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { Stack, Box, Button, Typography, useTheme } from "@mui/material";
+import { useNavigate, useParams } from "react-router-dom";
 import { FormField } from "@/presentation/components/FormField";
 import ImageUpload from "@/presentation/components/imagenUpload";
+import { useVehiclesData } from "@/presentation/hooks/useVehiclesData";
 
-const VehicleForm = () => {
+const UpdateVehiculoForm = () => {
   const theme = useTheme();
   const navigate = useNavigate();
+  const { id } = useParams(); 
 
+  const { vehicles, loading, error, updateVehicle } = useVehiclesData(); 
   const [formData, setFormData] = useState({
     numero: "",
     matricula: "",
+    image: "",
   });
+
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
+  useEffect(() => {
+    if (id) {
+      const vehicle = vehicles.find((v) => v.id === id);
+      if (vehicle) {
+        setFormData({
+          numero: vehicle.numero,
+          matricula: vehicle.matricula,
+          image: typeof vehicle.image === "string" ? vehicle.image : "",
+        });
+      }
+    }
+  }, [id, vehicles]);
 
   const handleChange = (name: string, value: string) => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleImageChange = (file: File | null) => {
+    setSelectedImage(file);
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log("Valores del formulario:", formData);
+    try {
+      const updatedData = {
+        numero: formData.numero,
+        matricula: formData.matricula,
+        image: selectedImage ?? (formData.image ? null : undefined),
+      };
+
+      if (id) {
+        await updateVehicle(id, updatedData);
+      } else {
+        console.error("El ID del vehículo no está definido.");
+      }
+      navigate(-1);
+    } catch (error) {
+      console.error("Error al actualizar el vehículo:", error);
+    }
   };
 
   const handleCancel = () => {
-    navigate(-1); 
+    navigate(-1);
   };
+
+  if (loading) {
+    return <Typography>Loading...</Typography>;
+  }
+
+  if (error) {
+    return <Typography color="error">{error}</Typography>;
+  }
 
   return (
     <Box
@@ -38,43 +84,38 @@ const VehicleForm = () => {
       }}
     >
       <Typography variant="h5" fontWeight="bold" textAlign="center" mb={3}>
-        
         Actualiza los datos del vehículo
       </Typography>
 
       <form onSubmit={handleSubmit}>
-        <Grid container spacing={2} alignItems="center">
-          <Grid item xs={12} md={4}>
-            <ImageUpload />
-          </Grid>
+        <Stack spacing={2} alignItems="center">
+          <ImageUpload onImageChange={handleImageChange} initialImage={formData.image || ""} />
 
-          <Grid item xs={12} md={8}>
-            <FormField
-              name="numero"
-              label="Número"
-              value={formData.numero}
-              onChange={(e) => handleChange("numero", e.target.value)}
-            />
-            <FormField
-              name="matricula"
-              label="Matrícula"
-              value={formData.matricula}
-              onChange={(e) => handleChange("matricula", e.target.value)}
-            />
+          <FormField
+            name="numero"
+            label="Número"
+            value={formData.numero}
+            onChange={(e) => handleChange("numero", e.target.value)}
+          />
+          <FormField
+            name="matricula"
+            label="Matrícula"
+            value={formData.matricula}
+            onChange={(e) => handleChange("matricula", e.target.value)}
+          />
 
-            <Box mt={3} display="flex" justifyContent="space-between">
-              <Button variant="outlined" color="secondary" onClick={handleCancel}>
-                Cancelar
-              </Button>
-              <Button type="submit" variant="contained" color="primary">
-                Actualizar
-              </Button>
-            </Box>
-          </Grid>
-        </Grid>
+          <Box mt={3} display="flex" justifyContent="space-between" width="100%">
+            <Button variant="outlined" color="secondary" onClick={handleCancel}>
+              Cancelar
+            </Button>
+            <Button type="submit" variant="contained" color="primary">
+              Actualizar
+            </Button>
+          </Box>
+        </Stack>
       </form>
     </Box>
   );
 };
 
-export default VehicleForm;
+export default UpdateVehiculoForm;
