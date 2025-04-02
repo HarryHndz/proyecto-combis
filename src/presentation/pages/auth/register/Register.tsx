@@ -51,7 +51,7 @@ export default function Register(){
     isSubmitting,
   } = useFormikForm<IRegister>({initialValues,validationSchema,onSubmit})
 
-  const handleNavigateToLogin=()=> navigate('/login') 
+  const handleNavigateToLogin=()=> navigate('/auth/login') 
  
   return (
     <Box
