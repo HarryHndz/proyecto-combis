@@ -36,6 +36,8 @@ export default function Drivers() {
     const fetchData = async () => {
       const chofe = await adminRepository.getChoferes()
       setData(chofe.data)
+      console.log(chofe);
+      
     }
 
     fetchData()

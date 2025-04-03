@@ -43,8 +43,9 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const id = localRepository.get('user',)
-      const user = await adminRepository.getDataUser(id)
+      const id = localRepository.get('id')
+      console.log('id', id)
+      const user = await adminRepository.getDataUser(id as unknown as number)
       setUserData(user.data)
     }
 
@@ -116,9 +117,9 @@ export default function UserProfile() {
           <Grid item xs={12} md={4}>
             <Card>
               <CardContent sx={{ display: "flex", flexDirection: "column", alignItems: "center", p: 3 }}>
-                <Avatar src={userData.avatar} alt={userData.name} sx={{ width: 120, height: 120, mb: 2 }} />
+                <Avatar src="../../../../public/perfil.png" alt={userData?.usuario} sx={{ width: 120, height: 120, mb: 2 }} />
                 <Typography variant="h5" component="h2" gutterBottom>
-                  {userData.name}
+                  {userData?.usuario}
                 </Typography>
                 <Button
                   variant="outlined"
@@ -153,28 +154,28 @@ export default function UserProfile() {
                     <Typography variant="subtitle2" color="text.secondary">
                       Nombre
                     </Typography>
-                    <Typography variant="body1">{userData.name}</Typography>
+                    <Typography variant="body1">{userData?.personas.nombre}</Typography>
                   </Box>
 
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary">
                       Correo Electrónico
                     </Typography>
-                    <Typography variant="body1">{userData.email}</Typography>
+                    <Typography variant="body1">{userData?.correo}</Typography>
                   </Box>
 
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary">
-                      Teléfono
+                      RFC
                     </Typography>
-                    <Typography variant="body1">{userData.phone}</Typography>
+                    <Typography variant="body1">{userData?.personas.rfc}</Typography>
                   </Box>
 
                   <Box>
                     <Typography variant="subtitle2" color="text.secondary">
-                      Dirección
+                      CURP
                     </Typography>
-                    <Typography variant="body1">{userData.address}</Typography>
+                    <Typography variant="body1">{userData?.personas.curp}</Typography>
                   </Box>
                 </Stack>
               </CardContent>
@@ -227,26 +228,26 @@ export default function UserProfile() {
         <DialogTitle>Editar Perfil</DialogTitle>
         <DialogContent>
           <Stack spacing={3} sx={{ mt: 1 }}>
-            <TextField label="Nombre" name="name" value={editFormData.name} onChange={handleEditFormChange} fullWidth />
+            <TextField label="Nombre" name="name" value={editFormData.usuario} onChange={handleEditFormChange} fullWidth />
             <TextField
               label="Correo Electrónico"
               name="email"
               type="email"
-              value={editFormData.email}
+              value={editFormData.correo}
               onChange={handleEditFormChange}
               fullWidth
             />
             <TextField
               label="Teléfono"
               name="phone"
-              value={editFormData.phone}
+              value={editFormData.personas?.curp}
               onChange={handleEditFormChange}
               fullWidth
             />
             <TextField
               label="Dirección"
               name="address"
-              value={editFormData.address}
+              value={editFormData.personas?.rfc}
               onChange={handleEditFormChange}
               fullWidth
               multiline

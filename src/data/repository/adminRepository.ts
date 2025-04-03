@@ -25,8 +25,8 @@ export class AdminRepository implements AdminInterface {
 
   async getChoferes(): Promise<IGetDriver> {
     try {
-      const response: IGetDriver = await this.httpClient.get(`choferes`)
-      return response
+      const response = await this.httpClient.get(`conductores`)
+      return response.data
     } catch (error) {
       throw error
     }
