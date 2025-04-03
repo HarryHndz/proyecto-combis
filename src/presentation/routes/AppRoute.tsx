@@ -12,6 +12,7 @@ import Drivers from "@/presentation/pages/admin/drivers/index";
 import AddDriver from "../pages/admin/drivers/add";
 import UpdateDriver from "../pages/admin/drivers/update";
 import DetailsDriver from "../pages/admin/drivers/detail";
+import UserProfile from "../pages/admin/account";
 
 const Router = () => {
   return (
@@ -30,6 +31,9 @@ const Router = () => {
             <Route path="new" index element={<AddDriver />} />
             <Route path="modify/:id" index element={<UpdateDriver />} />
             <Route path="details/:id" index element={<DetailsDriver />} />
+          </Route>
+          <Route path="account" index element={<UserProfile />}>
+
           </Route>
         </Route>
         <Route path="auth">

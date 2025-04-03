@@ -31,7 +31,7 @@ const NAVIGATION: Navigation = [
     icon: <AirlineSeatReclineNormalIcon />,
   },
   {
-    segment: 'account',
+    segment: 'admin/account',
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
   },

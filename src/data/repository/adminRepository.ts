@@ -1,6 +1,8 @@
 import { AdminInterface } from "@/domain/repository/adminInterface";
 import { ApiClient } from "@/data/apiClient";
 import { IRegisterDriver } from "@/domain/entities/IDriver";
+import { IUserRes } from "@/domain/entities/IUserRes";
+import { IGetDriver } from "@/domain/entities/IDriver";
 
 export class AdminRepository implements AdminInterface {
   private httpClient;
@@ -11,4 +13,24 @@ export class AdminRepository implements AdminInterface {
   async add(dataNew: IRegisterDriver): Promise<void> {
     console.log(dataNew);
   }
+
+  async getDataUser(id: number): Promise<IUserRes> {
+    try {
+      const response: IUserRes = await this.httpClient.get(`/usuarios/${id}`)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getChoferes(): Promise<IGetDriver> {
+    try {
+      const response: IGetDriver = await this.httpClient.get(`choferes`)
+      return response
+    } catch (error) {
+      throw error
+    }
+  }
+
+
 }
