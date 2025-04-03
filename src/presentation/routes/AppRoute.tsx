@@ -15,7 +15,6 @@ import DetailsDriver from "../pages/admin/drivers/detail";
 import Transport from "@/presentation/pages/admin/transport/Transport";
 import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
 import UpdateCombis from "@/presentation/pages/admin/transport/update";
-import RoutePlace from "../pages/admin/routes";
 
 const Router = () => {
   return (
@@ -35,9 +34,6 @@ const Router = () => {
             <Route path="register" element={<RegisterCombis />} />
             <Route path="update" element={<UpdateCombis />} />
             <Route index element={<Transport />} />
-          </Route>
-          <Route path="route">
-            <Route index element={<RoutePlace />} />
           </Route>
           <Route path="drivers">
             <Route index element={<Drivers />} />

@@ -19,7 +19,7 @@ export default function Login(){
   const onSubmit = async(values:ISession)=>{
     try {
       const response = await authRepository.login(values)
-      localRepository.save(response.id,response)
+      localRepository.save('user',response)
       navigate('/home')
     } catch (error) {
       console.log(error)

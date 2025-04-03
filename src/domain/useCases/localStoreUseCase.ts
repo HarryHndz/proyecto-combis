@@ -6,14 +6,14 @@ export class LocalStoreUseCase<T> implements LocalStoreInterface<T>{
   constructor(repository:LocalStoreRepository<T>){
     this.localRepository = repository
   }
-  save(key: number, value: T): void {
+  save(key: string, value: T): void {
     this.localRepository.save(key,value)
   }
-  get(key: number): T | null {
+  get(key: string): T | null {
     const data = this.localRepository.get(key)
     return data
   }
-  remove(key: number): void {
+  remove(key: string): void {
     this.localRepository.remove(key)
   }
 
