@@ -5,21 +5,21 @@ import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
-import { PageContainer } from '@toolpad/core/PageContainer';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
+
 const NAVIGATION: Navigation = [
   {
-    segment: 'home',
+    segment: 'user/home',
     title: 'Inicioooo',
     icon: <HomeIcon />,
   },
   {
-    segment: 'account',
+    segment: 'user/account',
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
   },
   {
-    segment: 'logout',
+    segment: 'user/profile',
     title: 'Cerrar Sesión',
     icon: <ExitToAppIcon />,
   },
@@ -53,14 +53,10 @@ export default function DashboardUserLayout(props: DemoProps) {
       navigation={NAVIGATION} 
       window={demoWindow}
       theme={demoTheme}
-      >
+    >
       <DashboardLayout>
-        <PageContainer>
-          <Outlet />
-        </PageContainer>
+        <Outlet />
       </DashboardLayout>
     </ReactRouterAppProvider>
   );
 }
-
-

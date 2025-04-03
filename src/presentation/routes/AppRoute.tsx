@@ -1,5 +1,5 @@
-import { BrowserRouter, Route, Routes } from "react-router";
-import Login  from "@/presentation/pages/auth/login/Login";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import Login from "@/presentation/pages/auth/login/Login";
 import Register from "@/presentation/pages/auth/register/Register";
 import Profile from "@/presentation/pages/user/profile/Profile";
 import Home from "@/presentation/pages/user/home/Home";
@@ -12,6 +12,9 @@ import Drivers from "@/presentation/pages/admin/drivers/index";
 import AddDriver from "../pages/admin/drivers/add";
 import UpdateDriver from "../pages/admin/drivers/update";
 import DetailsDriver from "../pages/admin/drivers/detail";
+import Transport from "@/presentation/pages/admin/transport/Transport";
+import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
+import UpdateCombis from "@/presentation/pages/admin/transport/update";
 import UserProfile from "../pages/admin/account";
 
 const Router = () => {
@@ -24,17 +27,22 @@ const Router = () => {
           <Route path="profile" element={<Profile />} />
         </Route>
         <Route path="admin" element={<DasboardAdminLayout />}>
-          <Route path="places" index element={<Places />} />
-          <Route path="add" index element={<AddPlace />} />
+          <Route path="places">
+            <Route index element={<Places />} />
+            <Route path="add" index element={<AddPlace />} />
+          </Route>
+          <Route path="transport">
+            <Route path="register" element={<RegisterCombis />} />
+            <Route path="update" element={<UpdateCombis />} />
+            <Route index element={<Transport />} />
+          </Route>
           <Route path="drivers">
             <Route index element={<Drivers />} />
             <Route path="new" index element={<AddDriver />} />
             <Route path="modify/:id" index element={<UpdateDriver />} />
             <Route path="details/:id" index element={<DetailsDriver />} />
           </Route>
-          <Route path="account" index element={<UserProfile />}>
-
-          </Route>
+          <Route path="account" index element={<UserProfile />}></Route>
         </Route>
         <Route path="auth">
           <Route path="register" element={<Register />} />
@@ -42,7 +50,7 @@ const Router = () => {
         </Route>
       </Routes>
     </BrowserRouter>
-  )
-}
+  );
+};
 
 export default Router;

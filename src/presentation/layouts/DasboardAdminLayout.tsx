@@ -1,27 +1,21 @@
 import { createTheme } from '@mui/material/styles';
-// import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
 import { Outlet } from 'react-router-dom';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
-import RouteIcon from '@mui/icons-material/Route';
 import PlaceIcon from '@mui/icons-material/Place';
 import AirlineSeatReclineNormalIcon from '@mui/icons-material/AirlineSeatReclineNormal';
+
 const NAVIGATION: Navigation = [
   {
-    segment: 'car',
+    segment: 'admin/transport',
     title: 'Combis',
     icon: <DirectionsCarIcon />,
   },
   {
-    segment: 'route',
-    title: 'Rutas',
-    icon: <RouteIcon />,
-  },
-  {
-    segment: 'place',
+    segment: 'admin/places',
     title: 'Paradas',
     icon: <PlaceIcon />,
   },

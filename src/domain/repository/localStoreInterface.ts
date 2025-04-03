@@ -1,5 +1,5 @@
 export interface LocalStoreInterface<T>{
-  save(key:number, value:T):void
-  get(key:number):T | null
-  remove(key:number):void
+  save(key:string, value:T):void
+  get(key:string):T | null
+  remove(key:string):void
 }

@@ -241,7 +241,7 @@ export default function Places() {
     <Box sx={{ width: '100%' }}>
       <Paper sx={{ width: '100%', mb: 2 }}>
         <EnhancedTableToolbar 
-          handelNavigate={()=>navigate('/admin/add')}
+          handelNavigate={()=>navigate('add')}
           />
         <TableContainer>
           <Table
