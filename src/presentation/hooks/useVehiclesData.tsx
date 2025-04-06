@@ -16,8 +16,24 @@ export const useVehiclesData = () => {
   const fetchVehicles = useCallback(async () => {
     setLoading(true);
     try {
-      const response = await vehicleUseCases.getVehicles();
-      setVehicles(response);
+      const response: IRegisterVehicle[] = await vehicleUseCases.getVehicles();
+
+      if (Array.isArray(response)) {
+        // Transformamos los datos para DataGrid (mostrando solo los campos necesarios)
+        const formattedVehicles = response.map((vehiculo) => ({
+          id_vehiculos: vehiculo.id_vehiculos,
+          numero: vehiculo.numero,
+          matricula: vehiculo.matricula,
+          activo: vehiculo.activo,
+          //ruta_nombre: vehiculo.ruta_nombre,
+          //id_dueno: vehiculo.id_dueno, 
+          //id_ruta: vehiculo.id_ruta,
+        }));
+
+        setVehicles(formattedVehicles);
+      } else {
+        setError("No se pudieron cargar los datos correctamente");
+      }
     } catch {
       setError("Error al obtener vehículos");
     } finally {
@@ -29,19 +45,17 @@ export const useVehiclesData = () => {
     fetchVehicles();
   }, [fetchVehicles]);
 
-  
   const registerVehicle = async (vehicleData: Partial<IRegisterVehicle>) => {
     setLoading(true);
     try {
       await vehicleUseCases.registerVehicle(vehicleData);
-      await fetchVehicles(); 
+      await fetchVehicles();
     } catch {
       setError("Error al registrar el vehículo");
     } finally {
       setLoading(false);
     }
   };
-
 
   const updateVehicle = async (id: string, vehicleData: Partial<IRegisterVehicle>) => {
     setLoading(true);
@@ -55,12 +69,11 @@ export const useVehiclesData = () => {
     }
   };
 
-
   const deleteVehicle = async (id: string) => {
     setLoading(true);
     try {
       await vehicleUseCases.deleteVehicle(id);
-      await fetchVehicles(); 
+      await fetchVehicles();
     } catch {
       setError("Error al eliminar el vehículo");
     } finally {

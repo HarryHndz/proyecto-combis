@@ -1,4 +1,4 @@
-import { Box, Chip, CircularProgress, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import { Box, CircularProgress, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -81,30 +81,30 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
 };
 
 const columns: GridColDef[] = [
-  { field: 'idVehiculo', headerName: 'Id vehículo', flex: 1, headerAlign: 'center', align: 'center' },
+  { field: 'id_vehiculos', headerName: 'Id vehículo', flex: 1, headerAlign: 'center', align: 'center' },
   { field: 'numero', headerName: 'Número', flex: 1, headerAlign: 'center', align: 'center' },
   { field: 'matricula', headerName: 'Matrícula', flex: 1, headerAlign: 'center', align: 'center' },
-  {
-    field: 'activo',
-    headerName: 'Activo',
-    flex: 1,
-    headerAlign: 'center',
-    align: 'center',
-    renderCell: (params) => (
-      <Chip
-        label={params.value ? 'Active' : 'Inactive'}
-        color={params.value ? 'success' : 'default'}
-        size="small"
-      />
-    ),
-  },
+  //{
+    //field: 'activo',
+    //headerName: 'Activo',
+    //flex: 1,
+    //headerAlign: 'center',
+    //align: 'center',
+    //renderCell: (params) => (
+      //<Chip
+        //label={params.value ? 'Active' : 'Inactive'}
+        //color={params.value ? 'success' : 'default'}
+        //size="small"
+      ///>
+    //),
+  //},
   {
     field: 'acciones',
     headerName: 'Acciones',
     flex: 0.5,
     headerAlign: 'center',
     align: 'center',
-    renderCell: (params) => <ActionsMenu idVehiculo={params.row.idVehiculo} />,
+    renderCell: (params) => <ActionsMenu idVehiculo={params.row.id_vehiculos.toString()} />,
   },
 ];
 
