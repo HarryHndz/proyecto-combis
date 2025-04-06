@@ -35,7 +35,9 @@ export default function Register(){
   const  navigate = useNavigate()
   const onSubmit = async(values:IRegister)=>{
     try {
-      await authRepository.register(values)
+      const data = await authRepository.register(values)
+      console.log('data',data)
+      navigate('/auth/login')
     } catch (error) {
       console.log(error);
     }

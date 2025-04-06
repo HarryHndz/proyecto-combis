@@ -20,7 +20,7 @@ export default function Login(){
     try {
       const response = await authRepository.login(values)
       localRepository.save('user',response)
-      navigate('/home')
+      navigate('/admin/')
     } catch (error) {
       console.log(error)
       

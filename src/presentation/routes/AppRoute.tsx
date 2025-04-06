@@ -40,7 +40,7 @@ const Router = () => {
             <Route index element={<Drivers />} />
             <Route path="new" index element={<AddDriver />} />
             <Route path="modify/:id" index element={<UpdateDriver />} />
-            <Route path="details/:id" index element={<DetailsDriver />} />
+            <Route path="details/:userId" index element={<DetailsDriver />} />
           </Route>
           <Route path="account" index element={<UserProfile />}></Route>
         </Route>

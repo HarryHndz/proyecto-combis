@@ -8,8 +8,9 @@ export class AuthRepository implements AuthInterface{
     this.httpClient = new ApiClient().getInstance()
   }
   async register(dataRegister: IRegister): Promise<void> {
+    console.log("dataRegister", dataRegister);
     try {
-      await this.httpClient.post('/usuarios',{
+      return await this.httpClient.post('/usuarios',{
         usuario: dataRegister.username,
         contrasena: dataRegister.password,
         correo: dataRegister.email,
@@ -34,11 +35,13 @@ export class AuthRepository implements AuthInterface{
         usuario:dataSession.username,
         contrasena:dataSession.password
       })
+
+      console.log('Respuesta',data)
       const response:IUser ={
-        username:data.correo,
-        id:data.usuario.id,
-        idTypeUser:data.usuario.tipo_usuario.id,
-        token:data.access_token 
+        username:data.data.usuario.usuario,
+        id:data.data.usuario.id,
+        idTypeUser:data.data.usuario.id_tipo_usuario,
+        token:data.data.access_token 
       } 
       return response
     } catch (error) {

@@ -17,38 +17,40 @@ import {
 } from "@mui/material"
 import { Person, Badge, CalendarMonth, Email, Info } from "@mui/icons-material"
 import { IUserResData } from "@/domain/entities/IUserRes"
+import { useParams } from "react-router-dom";
+import { AdminUseCases } from "@/domain/useCases/adminUseCases";
+import { AdminRepository } from "@/data/repository/adminRepository";
+import { useEffect, useState } from "react";
 
-const sampleData: IUserResData = {
-  id_usuario: 1,
-  id_persona: 101,
-  id_tipo_usuario: 2,
-  usuario: "jperez",
-  correo: "juan.perez@example.com",
-  activo: 1,
-  personas: {
-    id_persona: 101,
-    nombre: "Juan",
-    apellido_pat: "Pérez",
-    apellido_mat: "González",
-    sexo: 1,
-    fecha_nac: new Date("1990-05-15"),
-    curp: "PEGJ900515HDFRNL09",
-    rfc: "PEGJ900515RF5",
-  },
-  tipo_usuarios: {
-    id_tipo_usuario: 2,
-    nombre: "Administrador",
-    descripcion: "Usuario con permisos administrativos",
-  },
-}
+export default function DetailsDriver() {
+  const { userId } = useParams();
+  const [userData, setUserData] = useState<IUserResData>()
+  const adminRepository = new AdminUseCases(new AdminRepository)
+  useEffect(() => {
+    console.log('id', userId)
+    const fetchData = async () => {
+      try {
+        const response = await adminRepository.getDataUser(Number(userId))
+        setUserData(response.data)
+      } catch (error) {
+        console.error("Error fetching data:", error)
+      }
+    }
 
-export default function DetailsDriver({ userData = sampleData }: { userData?: IUserResData }) {
+    fetchData()
+  }
+    , [userId])
+
   const formatDate = (date: Date) => {
     return new Date(date).toLocaleDateString()
   }
 
   const getFullName = (data: IUserResData) => {
     return `${data.personas.nombre} ${data.personas.apellido_pat} ${data.personas.apellido_mat}`
+  }
+
+  if (!userData) {
+    return <div>Loading...</div>
   }
 
   return (

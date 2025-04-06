@@ -10,7 +10,7 @@ export class AuthUseCases implements AuthInterface{
   }
   async register(dataRegister: IRegister): Promise<void> {
     try {
-      await this.authRepository.register(dataRegister)
+      return await this.authRepository.register(dataRegister)
     } catch (error) {
       console.log(error)
       throw error

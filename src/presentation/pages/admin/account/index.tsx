@@ -43,9 +43,9 @@ export default function UserProfile() {
 
   useEffect(() => {
     const fetchData = async () => {
-      const id = localRepository.get('id')
-      console.log('id', id)
-      const user = await adminRepository.getDataUser(id as unknown as number)
+      const userLocal = localRepository.get('user')
+      console.log('id', userLocal?.id)
+      const user = await adminRepository.getDataUser(userLocal?.id as unknown as number)
       setUserData(user.data)
     }
 

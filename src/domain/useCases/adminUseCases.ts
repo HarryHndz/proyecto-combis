@@ -34,4 +34,12 @@ export class AdminUseCases implements AdminInterface {
       throw error
     }
   }
+
+  async getDataDriver(id: number): Promise<IGetDriver> {
+    try {
+      return await this.adminRepository.getDataDriver(id)
+    } catch (error) {
+      throw error
+    }
+  }
 }

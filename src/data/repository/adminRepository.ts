@@ -16,8 +16,9 @@ export class AdminRepository implements AdminInterface {
 
   async getDataUser(id: number): Promise<IUserRes> {
     try {
-      const response: IUserRes = await this.httpClient.get(`/usuarios/${id}`)
-      return response
+      const {data} = await this.httpClient.get(`/usuarios/${id}`)
+      console.log('Respuesta',data);
+      return data
     } catch (error) {
       throw error
     }
@@ -32,5 +33,12 @@ export class AdminRepository implements AdminInterface {
     }
   }
 
-
+  async getDataDriver(id: number): Promise<IGetDriver> {
+    try {
+      const response = await this.httpClient.get(`conductores/${id}`)
+      return response.data
+    } catch (error) {
+      throw error
+    }
+  }
 }
