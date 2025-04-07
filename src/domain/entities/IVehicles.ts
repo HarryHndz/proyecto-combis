@@ -3,7 +3,7 @@ export interface IRegisterVehicle {
     activo?: any; // Hacerlo opcional para que no sea necesario al momento de registrar
     ruta_nombre?: any; // Hacerlo opcional
     id_vehiculos?: number; // Hacerlo opcional
-    id_dueno?: number; // Hacerlo opcional
+    id_dueno?: number; // Hacerlo opcional 
     id_ruta?: number; // Hacerlo opcional
     numero?: string; // Hacerlo opcional
     matricula?: string; // Hacerlo opcional

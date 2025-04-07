@@ -13,7 +13,6 @@ import AddDriver from "../pages/admin/drivers/add";
 import UpdateDriver from "../pages/admin/drivers/update";
 import DetailsDriver from "../pages/admin/drivers/detail";
 import Transport from "@/presentation/pages/admin/transport/Transport";
-import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
 import UpdateCombis from "@/presentation/pages/admin/transport/update";
 import RoutePlace from "../pages/admin/routes";
 import DetailsCombis from "../pages/admin/transport/DetailsCombis";
@@ -33,7 +32,6 @@ const Router = () => {
             <Route path="add" index element={<AddPlace />} />
           </Route>
           <Route path="transport">
-            <Route path="register" element={<RegisterCombis />} />
             <Route path="update" element={<UpdateCombis />} />
             <Route path ="details/:id" element={<DetailsCombis />} />
             <Route index element={<Transport />} />

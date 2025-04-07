@@ -38,7 +38,7 @@ export class VehicleRepository {
     }
   }
   
-  // Método para obtener los detalles de un vehículo específico
+
   async getVehicleById(id: string): Promise<IRegisterVehicle> {
     try {
       const response = await this.httpClient.get(`/vehiculos/${id}`);

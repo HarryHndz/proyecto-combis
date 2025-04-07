@@ -84,20 +84,6 @@ const columns: GridColDef[] = [
   { field: 'id_vehiculos', headerName: 'Id vehículo', flex: 1, headerAlign: 'center', align: 'center' },
   { field: 'numero', headerName: 'Número', flex: 1, headerAlign: 'center', align: 'center' },
   { field: 'matricula', headerName: 'Matrícula', flex: 1, headerAlign: 'center', align: 'center' },
-  //{
-    //field: 'activo',
-    //headerName: 'Activo',
-    //flex: 1,
-    //headerAlign: 'center',
-    //align: 'center',
-    //renderCell: (params) => (
-      //<Chip
-        //label={params.value ? 'Active' : 'Inactive'}
-        //color={params.value ? 'success' : 'default'}
-        //size="small"
-      ///>
-    //),
-  //},
   {
     field: 'acciones',
     headerName: 'Acciones',
@@ -135,6 +121,7 @@ export default function DataGridVehiculos() {
         <DataGrid
           rows={vehicles}  
           columns={columns}  
+          getRowId={(row) => row.id_vehiculos} // Aquí está la modificación
           autoHeight
           initialState={{
             pagination: {

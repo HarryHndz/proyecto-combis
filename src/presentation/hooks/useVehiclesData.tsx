@@ -7,30 +7,27 @@ export const useVehiclesData = () => {
   const [vehicles, setVehicles] = useState<IRegisterVehicle[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [isFetched, setIsFetched] = useState<boolean>(false);  // Estado para verificar si ya se cargaron los vehículos
 
-  const vehicleUseCases = useMemo(() => {
-    const vehicleRepository = new VehicleRepository();
-    return new VehicleUseCases(vehicleRepository);
-  }, []);
+  const vehicleRepository = useMemo(() => new VehicleRepository(), []);
+  const vehicleUseCases = useMemo(() => new VehicleUseCases(vehicleRepository), [vehicleRepository]);
 
   const fetchVehicles = useCallback(async () => {
+    if (isFetched || loading) return;  // Verifica si ya fue cargado o si está en proceso de carga
     setLoading(true);
     try {
       const response: IRegisterVehicle[] = await vehicleUseCases.getVehicles();
 
       if (Array.isArray(response)) {
-        // Transformamos los datos para DataGrid (mostrando solo los campos necesarios)
         const formattedVehicles = response.map((vehiculo) => ({
           id_vehiculos: vehiculo.id_vehiculos,
           numero: vehiculo.numero,
           matricula: vehiculo.matricula,
           activo: vehiculo.activo,
-          //ruta_nombre: vehiculo.ruta_nombre,
-          //id_dueno: vehiculo.id_dueno, 
-          //id_ruta: vehiculo.id_ruta,
         }));
 
         setVehicles(formattedVehicles);
+        setIsFetched(true);  // Marcar como cargados
       } else {
         setError("No se pudieron cargar los datos correctamente");
       }
@@ -39,11 +36,11 @@ export const useVehiclesData = () => {
     } finally {
       setLoading(false);
     }
-  }, [vehicleUseCases]);
+  }, [vehicleUseCases, isFetched, loading]);  // Asegúrate de que no se dispare mientras se está cargando
 
   useEffect(() => {
     fetchVehicles();
-  }, [fetchVehicles]);
+  }, [fetchVehicles]);  // Solo se ejecuta si fetchVehicles cambia
 
   const registerVehicle = async (vehicleData: Partial<IRegisterVehicle>) => {
     setLoading(true);
@@ -91,3 +88,4 @@ export const useVehiclesData = () => {
     fetchVehicles,
   };
 };
+export default useVehiclesData;
