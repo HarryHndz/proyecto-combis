@@ -3,6 +3,10 @@ import axios, { AxiosInstance } from 'axios'
 
 export class ApiClient{
   private api:AxiosInstance
+  post: any
+  get: any
+  put: any
+  delete: any
   constructor(){
     this.api = axios.create({
       baseURL:URL_SERVER,

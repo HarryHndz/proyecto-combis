@@ -20,6 +20,7 @@ export const useVehicleFormikForm = (
     isSubmitting,
     touched,
     setFieldValue,
+    resetForm,  // Aseguramos que resetForm sea parte del retorno
   } = useFormik<IRegisterVehicle>({
     initialValues,
     validationSchema,
@@ -35,5 +36,6 @@ export const useVehicleFormikForm = (
     isSubmitting,
     touched,
     setFieldValue,
+    resetForm,  // Devolvemos resetForm para su uso en el componente
   };
 };

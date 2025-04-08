@@ -9,14 +9,13 @@ import {
   CircularProgress,
 } from "@mui/material";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FormField } from "@/presentation/components/FormField";
 import { useVehicleFormikForm } from "@/presentation/hooks/useFormikCombis";
 import validationSchema from "@/domain/validation/VehiclesValidation";
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
-import { VehicleUseCases } from "@/domain/useCases/vehiclesUseCases";
-import { VehicleRepository } from "@/data/repository/VehiclesRepository";
 import CustomAlert from "@/presentation/components/alert";
+import useVehiclesData from "@/presentation/hooks/useVehiclesData";
 
 interface VehicleFormModalProps {
   open: boolean;
@@ -27,74 +26,88 @@ interface VehicleFormModalProps {
 const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) => {
   const [showAlert, setShowAlert] = useState(false);
   const [alertData, setAlertData] = useState<{
-    severity: 'success' | 'error';
+    severity: "success" | "error";
     title: string;
     message: string;
   } | null>(null);
-  const [isLoading, setIsLoading] = useState(false);
 
-  const vehicleRepository = new VehicleRepository();
-  const vehicleUseCases = new VehicleUseCases(vehicleRepository);
+  const { registerVehicle, loading } = useVehiclesData();
+  const storedId = typeof window !== "undefined" ? localStorage.getItem("id_dueno") : null;
+  const idDueno = storedId ? Number(storedId) : null;
+
+  useEffect(() => {
+    if (!idDueno && open) {
+      setAlertData({
+        severity: "error",
+        title: "ID no encontrado",
+        message: "No se encontró el ID del dueño. Intenta iniciar sesión nuevamente.",
+      });
+      setShowAlert(true);
+    }
+  }, [idDueno, open]);
 
   const initialValues: Partial<IRegisterVehicle> = {
     numero: "",
     matricula: "",
-    id_dueno: 2,
+    id_dueno: idDueno ?? undefined,
     id_ruta: undefined,
-  };
-
-  const handleSubmit = async (values: Partial<IRegisterVehicle>) => {
-    setIsLoading(true);
-    setAlertData(null);
-    try {
-      const dataToSend = {
-        numero: values.numero,
-        matricula: values.matricula,
-        id_dueno: 1,
-        id_ruta: values.id_ruta ?? undefined,
-      };
-
-      await vehicleUseCases.registerVehicle(dataToSend);
-
-      setAlertData({
-        severity: "success",
-        title: "Registro Exitoso",
-        message: "La combi se ha registrado correctamente.",
-      });
-
-      setShowAlert(true);
-
-      setTimeout(() => {
-        setShowAlert(false);
-        onClose();
-        if (onSuccess) onSuccess();
-      }, 3000);
-    } catch (error) {
-      console.error("Error al registrar la combi:", error);
-      setAlertData({
-        severity: "error",
-        title: "Error",
-        message: "Ocurrió un error al registrar la combi. Intenta nuevamente.",
-      });
-      setShowAlert(true);
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const {
     values,
     errors,
+    touched,
     handleBlur,
     handleChange,
-    handleSubmit: formikSubmit,
+    handleSubmit,
     isSubmitting,
-    touched,
+    resetForm,
   } = useVehicleFormikForm({
     initialValues,
     validationSchema,
-    onSubmit: handleSubmit,
+    onSubmit: async (values) => {
+      if (!idDueno) return;
+
+      try {
+        await registerVehicle({
+          ...values,
+          id_dueno: idDueno,
+          id_ruta: values.id_ruta ?? undefined,
+        });
+
+        setAlertData({
+          severity: "success",
+          title: "Registro exitoso",
+          message: "La combi se ha registrado correctamente.",
+        });
+        setShowAlert(true);
+
+        setTimeout(() => {
+          setShowAlert(false);
+          resetForm();
+          onClose();
+          onSuccess?.();
+        }, 2500);
+      } catch {
+        setAlertData({
+          severity: "error",
+          title: "Error",
+          message: "Ocurrió un error al registrar la combi. Intenta nuevamente.",
+        });
+        setShowAlert(true);
+      }
+    },
   });
+
+  useEffect(() => {
+    if (open) {
+      resetForm();
+      setAlertData(null);
+      setShowAlert(false);
+    }
+  }, [open, resetForm]);
+
+  if (!idDueno) return null;
 
   return (
     <Dialog open={open} onClose={onClose} maxWidth="sm" fullWidth>
@@ -106,6 +119,7 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
           </Typography>
         </Box>
       </DialogTitle>
+
       <DialogContent dividers>
         {showAlert && alertData && (
           <CustomAlert
@@ -115,9 +129,10 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
             onClose={() => setShowAlert(false)}
           />
         )}
+
         <Box
           component="form"
-          onSubmit={formikSubmit}
+          onSubmit={handleSubmit}
           display="flex"
           flexDirection="column"
           gap={2}
@@ -131,6 +146,7 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
             onBlur={handleBlur}
             error={touched.numero && Boolean(errors.numero)}
             helperText={touched.numero && errors.numero}
+            autoFocus
           />
           <FormField
             name="matricula"
@@ -143,18 +159,20 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
           />
         </Box>
       </DialogContent>
+
       <DialogActions sx={{ padding: "1rem 1.5rem" }}>
-        <Button onClick={onClose} variant="outlined" color="secondary" disabled={isLoading}>
+        <Button onClick={onClose} variant="outlined" color="secondary" disabled={loading}>
           Cancelar
         </Button>
         <Button
-          onClick={() => formikSubmit()}
+          type="submit"
+          onClick={() => handleSubmit()}
           variant="contained"
           color="primary"
-          disabled={isSubmitting || isLoading}
-          startIcon={isLoading ? <CircularProgress size={20} color="inherit" /> : null}
+          disabled={isSubmitting || loading}
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
         >
-          {isLoading ? "Registrando..." : "Enviar"}
+          {loading ? "Registrando..." : "Enviar"}
         </Button>
       </DialogActions>
     </Dialog>
@@ -162,3 +180,5 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
 };
 
 export default VehicleFormModal;
+export { VehicleFormModal };
+export type { VehicleFormModalProps };  

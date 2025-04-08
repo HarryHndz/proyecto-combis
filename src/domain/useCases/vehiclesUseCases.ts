@@ -1,44 +1,51 @@
+import { LocalStoreRepository } from "@/data/repository/localRepository";
 import { VehicleRepository } from "@/data/repository/VehiclesRepository";
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
+import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase"; // Asegúrate de importar el caso de uso
 
 export class VehicleUseCases {
   private vehicleRepository: VehicleRepository;
+  private localStoreUseCase: LocalStoreUseCase<any>;
 
   constructor(repository: VehicleRepository) {
     this.vehicleRepository = repository;
+    this.localStoreUseCase = new LocalStoreUseCase<any>(new LocalStoreRepository());
   }
 
-  // Método para registrar un vehículo con valores predeterminados si es necesario
+  // Método para registrar un vehículo
   async registerVehicle(dataRegister: Partial<IRegisterVehicle>): Promise<void> {
-    // Aseguramos que todos los campos importantes tengan un valor por defecto si no se pasan
+    const userId = this.localStoreUseCase.get(1);
+    if (!userId) {
+      throw new Error("El usuario no ha iniciado sesión");
+    }
+
     const completeData: IRegisterVehicle = {
-      numero: dataRegister.numero || "", 
-      matricula: dataRegister.matricula || "", 
-      id_dueno: dataRegister.id_dueno ?? 1, // Asignamos 1 como valor por defecto
-      id_ruta: dataRegister.id_ruta ?? undefined, // Puede ser undefined si no es necesario
+      numero: dataRegister.numero || "",
+      matricula: dataRegister.matricula || "",
+      id_dueno: userId,
+      id_ruta: dataRegister.id_ruta ?? undefined,
     };
 
-    console.log("🚀 Datos enviados al backend:", completeData);
+    // Validación adicional aquí, si es necesario
+    if (!completeData.numero || !completeData.matricula) {
+      throw new Error("Número y matrícula son obligatorios.");
+    }
 
-    // Pasamos los datos completos al repositorio para su registro
     return this.vehicleRepository.registerVehicle(completeData);
   }
 
-  // Obtener todos los vehículos
+  // Obtener todos los vehículos del dueño
   async getVehicles(): Promise<IRegisterVehicle[]> {
+    const userId = this.localStoreUseCase.get(1);
+    if (!userId) {
+      throw new Error("El usuario no ha iniciado sesión");
+    }
+
     const response = await this.vehicleRepository.getVehicles();
-    return response.map((vehicle) => ({
-      id_vehiculos: typeof vehicle.id_vehiculos === "number" ? vehicle.id_vehiculos : undefined,
-      numero: vehicle.numero ?? "",
-      matricula: vehicle.matricula ?? "",
-      id_dueno: vehicle.id_dueno ?? 0,
-      id_ruta: vehicle.id_ruta ?? 0,
-      ruta_nombre: vehicle.rutas?.nombre ?? "",
-      activo: vehicle.rutas?.activo ?? false,
-    }));
+    return response.filter(vehicle => vehicle.id_dueno === userId);
   }
 
-  // Obtener los detalles de un vehículo específico por ID
+  // Obtener detalles de un vehículo
   async getVehicleDetails(id: string): Promise<IRegisterVehicle> {
     const response = await this.vehicleRepository.getVehicleById(id);
     return {
@@ -54,11 +61,16 @@ export class VehicleUseCases {
 
   // Actualizar los datos de un vehículo
   async updateVehicle(id: string, data: Partial<IRegisterVehicle>): Promise<void> {
+    const userId = this.localStoreUseCase.get(1);
+    if (!userId) {
+      throw new Error("El usuario no ha iniciado sesión");
+    }
+
     const completeData: IRegisterVehicle = {
-      id_vehiculos: typeof data.id_vehiculos === "string" ? parseInt(data.id_vehiculos, 10) : data.id_vehiculos ?? parseInt(id, 10), // Convertimos a número si es string
+      id_vehiculos: typeof data.id_vehiculos === "string" ? parseInt(data.id_vehiculos, 10) : data.id_vehiculos ?? parseInt(id, 10),
       numero: data.numero ?? "",
       matricula: data.matricula ?? "",
-      id_dueno: data.id_dueno ?? 0,
+      id_dueno: userId,
       id_ruta: data.id_ruta ?? 0,
       ruta_nombre: data.ruta_nombre ?? "",
       activo: data.activo ?? false,
@@ -69,6 +81,11 @@ export class VehicleUseCases {
 
   // Eliminar un vehículo
   async deleteVehicle(id: string): Promise<void> {
+    const userId = this.localStoreUseCase.get(1);
+    if (!userId) {
+      throw new Error("El usuario no ha iniciado sesión");
+    }
+
     return this.vehicleRepository.deleteVehicle(id);
   }
 }
