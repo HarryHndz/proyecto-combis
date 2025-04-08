@@ -1,1 +1,1 @@
-export type IUserType = 'passengers' | 'driver' | 'boss'
+export type IUserType = '2' | '3' | '4'

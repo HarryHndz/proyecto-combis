@@ -14,12 +14,12 @@ export class AuthRepository implements AuthInterface{
         usuario: dataRegister.username,
         contrasena: dataRegister.password,
         correo: dataRegister.email,
-        id_tipo_usuario: 1,
+        id_tipo_usuario: Number(dataRegister.userType),
         persona: {
           nombre: dataRegister.name,
           apellido_pat: dataRegister.paternalSurName,
           apellido_mat: dataRegister.maternalSurName,
-          sexo: 1,
+          sexo: Number(dataRegister.gender),
           fecha_nac: dataRegister.date,
           curp: dataRegister.curp,
           rfc: dataRegister.rfc
@@ -36,11 +36,10 @@ export class AuthRepository implements AuthInterface{
         contrasena:dataSession.password
       })
 
-      console.log('Respuesta',data)
       const response:IUser ={
         username:data.data.usuario.usuario,
         id:data.data.usuario.id,
-        idTypeUser:data.data.usuario.id_tipo_usuario,
+        idTypeUser:data.data.usuario.tipo_usuario.id_tipo_usuario,
         token:data.data.access_token 
       } 
       return response

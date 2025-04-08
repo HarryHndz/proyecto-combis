@@ -8,7 +8,10 @@ const validationSchema = yup.object({
   gender: yup.string().oneOf(["0", "1"], "Seleccione un sexo válido").required("El sexo es requerido"),
   curp: yup.string().required("La curp es requerido"),
   rfc: yup.string().required("El RFC es requerido"),
-  date: yup.date().required("La fecha de nacimiento es requerida"),
+  date: yup.date().required("La fecha de nacimiento es requerida").max(
+    new Date(new Date().setFullYear(new Date().getFullYear() - 18)),
+    "Fecha inválida"
+  ),
   email: yup.string().email("Correo inválido").required("El correo es requerido"),
   password: yup.string().min(6, "Mínimo 6 caracteres").required("La contraseña es requerida"),
   confirmPassword: yup.string().oneOf([yup.ref("password"), undefined], "Las contraseñas deben coincidir").required("Confirme su contraseña"),

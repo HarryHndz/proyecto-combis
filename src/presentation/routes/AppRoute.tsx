@@ -16,6 +16,7 @@ import Transport from "@/presentation/pages/admin/transport/Transport";
 import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis";
 import UpdateCombis from "@/presentation/pages/admin/transport/update";
 import UserProfile from "../pages/admin/account";
+import { ProtectedRoute } from "@/domain/validation/userValidation";
 
 const Router = () => {
   return (
@@ -26,28 +27,31 @@ const Router = () => {
           <Route path="account" element={<Account />} />
           <Route path="profile" element={<Profile />} />
         </Route>
-        <Route path="admin" element={<DasboardAdminLayout />}>
-          <Route path="places">
-            <Route index element={<Places />} />
-            <Route path="add" index element={<AddPlace />} />
+        <Route element={<ProtectedRoute allowedRoles={[1, 2, 3, 4]} />}>
+          <Route path="admin" element={<DasboardAdminLayout />}>
+            <Route path="places">
+              <Route index element={<Places />} />
+              <Route path="add" index element={<AddPlace />} />
+            </Route>
+            <Route path="transport">
+              <Route path="register" element={<RegisterCombis />} />
+              <Route path="update" element={<UpdateCombis />} />
+              <Route index element={<Transport />} />
+            </Route>
+            <Route path="drivers">
+              <Route index element={<Drivers />} />
+              <Route path="new" index element={<AddDriver />} />
+              <Route path="modify/:id" index element={<UpdateDriver />} />
+              <Route path="details/:userId" index element={<DetailsDriver />} />
+            </Route>
+            <Route path="account" index element={<UserProfile />}></Route>
           </Route>
-          <Route path="transport">
-            <Route path="register" element={<RegisterCombis />} />
-            <Route path="update" element={<UpdateCombis />} />
-            <Route index element={<Transport />} />
-          </Route>
-          <Route path="drivers">
-            <Route index element={<Drivers />} />
-            <Route path="new" index element={<AddDriver />} />
-            <Route path="modify/:id" index element={<UpdateDriver />} />
-            <Route path="details/:userId" index element={<DetailsDriver />} />
-          </Route>
-          <Route path="account" index element={<UserProfile />}></Route>
         </Route>
         <Route path="auth">
           <Route path="register" element={<Register />} />
           <Route index path="login" element={<Login />} />
         </Route>
+
       </Routes>
     </BrowserRouter>
   );

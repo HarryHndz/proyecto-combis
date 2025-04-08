@@ -15,20 +15,20 @@ const SEX:IValues<string>[] =[
 
 const USERS:IValues<IUserType>[] = [
   {
-  label:'Pasajero',
-  value:'passengers'
+  label:'Dueño de combi',
+  value:'2'
   },
   {
-  label:'Chofer',
-  value:'driver'
+  label:'Conductor',
+  value:'3'
   },
   {
-  label:'Dueño',
-  value:'boss'
+  label:'Checador',
+  value:'4'
   },
 ]
 
-const URL_SERVER = 'https://34p0bkp2-3000.usw3.devtunnels.ms/'
+const URL_SERVER = 'https://47k9gmbc-3000.usw3.devtunnels.ms/'
 
 export {
   USERS,

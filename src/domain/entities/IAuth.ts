@@ -1,5 +1,3 @@
-import { IUserType } from "./IUserType";
-
 export interface IRegister {
   username:string,
   name: string
@@ -10,10 +8,9 @@ export interface IRegister {
   email: string
   password: string
   confirmPassword: string
-  userType: IUserType
+  userType: string
   curp?: string
   rfc?: string
-  conditionsTerms: boolean
 }
 
 export interface IUser extends Pick<IRegister,'username'>{

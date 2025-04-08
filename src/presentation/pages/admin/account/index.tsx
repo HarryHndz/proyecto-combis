@@ -1,4 +1,3 @@
-"use client"
 import { useEffect, useState } from "react"
 import {
   Avatar,
@@ -35,16 +34,18 @@ import { IUserResData } from "@/domain/entities/IUserRes"
 import { LocalStoreRepository } from "@/data/repository/localRepository"
 import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase"
 import { IUser } from "@/domain/entities/IAuth"
+import { useAuth } from "@/domain/validation/AuthContext"
 
 export default function UserProfile() {
   const [userData, setUserData] = useState<IUserResData>()
   const adminRepository = new AdminUseCases(new AdminRepository)
   const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository())
+  const { logout } = useAuth();
 
   useEffect(() => {
     const fetchData = async () => {
       const userLocal = localRepository.get('user')
-      console.log('id', userLocal?.id)
+      console.log('id', userLocal)
       const user = await adminRepository.getDataUser(userLocal?.id as unknown as number)
       setUserData(user.data)
     }
@@ -83,7 +84,12 @@ export default function UserProfile() {
 
   // Save profile changes
   const saveProfileChanges = () => {
-    setUserData(editFormData)
+    setUserData({
+      ...editFormData,
+      id_usuario: editFormData.id_usuario ?? 0,
+      id_persona: editFormData.id_persona ?? 0,
+      id_tipo_usuario: editFormData.id_tipo_usuario ?? 0,
+    } as IUserResData)
     setEditProfileOpen(false)
   }
 
@@ -99,10 +105,9 @@ export default function UserProfile() {
     setChangePasswordOpen(false)
   }
 
-  // Handle logout
+  
   const handleLogout = () => {
-    console.log("User logged out")
-    // Here you would implement the actual logout logic
+    logout()
   }
 
   return (

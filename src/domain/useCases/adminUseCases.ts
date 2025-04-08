@@ -9,15 +9,6 @@ export class AdminUseCases implements AdminInterface {
     this.adminRepository = repository
   }
 
-  async add(dataNew: any): Promise<void> {
-    try {
-      await this.adminRepository.add(dataNew)
-    } catch (error) {
-      console.log(error)
-      throw error
-    }
-  }
-
   async getDataUser(id: number): Promise<IUserRes>{
     try {
       return await this.adminRepository.getDataUser(id)
