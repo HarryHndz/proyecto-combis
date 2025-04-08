@@ -16,6 +16,9 @@ import validationSchema from "@/domain/validation/VehiclesValidation";
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
 import CustomAlert from "@/presentation/components/alert";
 import useVehiclesData from "@/presentation/hooks/useVehiclesData";
+import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
+import { IUser } from "@/domain/entities/IAuth";
+import { LocalStoreRepository } from "@/data/repository/localRepository";
 
 interface VehicleFormModalProps {
   open: boolean;
@@ -32,8 +35,9 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
   } | null>(null);
 
   const { registerVehicle, loading } = useVehiclesData();
-  const storedId = typeof window !== "undefined" ? localStorage.getItem("id_dueno") : null;
-  const idDueno = storedId ? Number(storedId) : null;
+  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository())
+  const storedId = typeof window !== "undefined" ? localRepository.get('user') : null;
+  const idDueno = storedId?.id
 
   useEffect(() => {
     if (!idDueno && open) {
