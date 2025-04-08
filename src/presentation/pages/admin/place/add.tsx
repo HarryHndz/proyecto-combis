@@ -1,40 +1,70 @@
-import { IPlace, IRoute } from "@/domain/entities/IPlaces";
+import { IPlace, IRoutePlaceAdd } from "@/domain/entities/IPlaces";
 import { FormCheckbox } from "@/presentation/components/Checkbox";
 import { FormField } from "@/presentation/components/FormField";
 import { ModalAddPlace } from "@/presentation/components/ModalAddPlace";
-import { Avatar, Box, Button, Container,List,ListItem,ListItemAvatar,ListItemText,Typography, useTheme } from "@mui/material";
-import { useState } from "react";
-import ImageIcon from '@mui/icons-material/Image';
+import { Avatar, Box, Button, Container,IconButton,List,ListItem,ListItemAvatar,ListItemText,Typography, useTheme } from "@mui/material";
+import { useEffect, useState } from "react";
+import PlaceIcon from '@mui/icons-material/Place';
 import { useFormikForm } from "@/presentation/hooks/useFormikValues";
+import DeleteIcon from '@mui/icons-material/Delete';
 import placeValidation from "@/domain/validation/placesValidation";
+import { PlaceUseCases } from "@/domain/useCases/placeUseCases";
+import { useNavigate } from "react-router-dom";
 
 export default function AddPlace() {
-  const [places,setplaces] = useState<IPlace[]>([])
+  const router = useNavigate()
+  const [places,setPlaces] = useState<IPlace[]>([])
+  const [locationCurrent,setLocationCurrent] = useState({
+    latitude:0,
+    longitude:0
+  })
   const [activate,setActivate] = useState<boolean>(false)
   const theme = useTheme()
-  const [initialValues,setInitialValues] =useState<IRoute>({
+  const initialValues:IRoutePlaceAdd = {
     name:'',
-    places,
-  }) 
-  const onSubmit = async(values:IRoute)=>{
+    places:[],
+  } 
+  const onSubmit = async(values:IRoutePlaceAdd)=>{
     try {
-      // const response = await authRepository.login(values)
-      // localRepository.save('user',response)
-      // navigate('/home')
+      const placeUseCases = new PlaceUseCases()
+      await placeUseCases.createPlace(values)
+      router('/')
     } catch (error) {
-      // console.log(error)
-      
+      console.log(error)
     }
   }
   const {
       handleBlur,
       handleChange,
       handleSubmit,
+      setFieldValue,
       isSubmitting,
       values,
       errors,
       touched,
-    } = useFormikForm<IRoute>({initialValues,validationSchema:placeValidation,onSubmit})
+    } = useFormikForm<IRoutePlaceAdd>(
+      {initialValues,validationSchema:placeValidation,onSubmit}
+    )
+  useEffect(()=>{
+    if(navigator.geolocation){
+      navigator.geolocation.getCurrentPosition((e)=>{
+        setLocationCurrent({
+          latitude:e.coords.latitude,
+          longitude:e.coords.longitude
+        })
+      },(error)=>{
+        console.log("error PERMISSION_DENIED ",error.PERMISSION_DENIED);
+        console.log("error POSITION_UNAVAILABLE ",error.POSITION_UNAVAILABLE);
+        console.log("error TIMEOUT ",error.TIMEOUT);
+        console.log("error code ",error.code);
+        console.log("error mesage ",error.message);
+        
+      })
+    }else{
+      console.log("geolocalización no soportada");
+    }
+  },[])
+
   
   return(
     <Container>
@@ -46,44 +76,74 @@ export default function AddPlace() {
           width:'100%',
           alignItems:'center',
           justifyContent:'center',
-          flexDirection:'column'
+          flexDirection:'column',
+          marginTop:'20px'
         }}
       >
         <form
-        style={{width:'80%',display:'flex',flexDirection:'column'}}
+          onSubmit={handleSubmit}
+          style={{width:'80%',display:'flex',flexDirection:'column'}}
         >
-        <Box sx={{width:'400px'}}>
-          <Typography>Agregar Rutas</Typography>
+        <Box sx={{width:'400px',padding:'30px 10px'}}>
+          <Typography variant="h3" sx={{paddingBottom:'10px'}}>Agregar Rutas</Typography>
           <FormField 
             label="Nombre de la ruta"
+            onChange={handleChange('name')}
+            onBlur={handleBlur('name')}
+            value={values.name}
+            error={touched.name && errors.name ? true :false}
           />
-          <Typography>Paradas</Typography>
           <FormCheckbox 
             label="Activar ruta"
             checked
             handleChange={()=> setActivate(!activate)}
           />
+          <Box sx={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:'20px',marginBottom:'5px'}}>
+            <Typography variant="h5">Paradas</Typography>
+              <ModalAddPlace
+              places={places}
+              setPlaces={setPlaces}
+              handleAdd={(e)=>{
+                console.log("valores",e);
+                setFieldValue('places',e)
+              }}
+              latitudeCurrent={locationCurrent.latitude}
+              longitudeCurrent={locationCurrent.longitude}
+            />
+          </Box>
+         
            <List sx={{ width: '100%', maxWidth: 360}}>
             {
-              places.length > 0 ? places.map((item)=>(
+              values.places.length > 0 ? values.places.map((item)=>(
                 <ListItem>
                   <ListItemAvatar>
                     <Avatar>
-                      <ImageIcon />
+                     <PlaceIcon/>
                     </Avatar>
                   </ListItemAvatar>
-                  <ListItemText primary={item.name} secondary={item.order} />
+                  <ListItemText primary={`${item.name} - ${item.order}`} secondary={
+                    <>
+                     <Typography>{`Latitud: ${item.latitude}`}</Typography>
+                     <Typography>{`Longitud: ${item.longitude}`}</Typography>
+                    </>
+                  } />
+                  <IconButton onClick={()=>{
+                    const newPlaces = values.places.filter((place)=>(place.name !== item.name))
+                    setPlaces(newPlaces)
+                    setFieldValue('places',newPlaces)
+                  }}>
+                    <DeleteIcon />
+                  </IconButton>
                 </ListItem>
               )) : <Typography>No se ha registrado ninguna ruta</Typography>
             }
           </List>
-          <ModalAddPlace 
-            places={places}
-            setPlaces={setplaces}
-          />
           <Button 
             fullWidth
-            variant='outlined'>Guardar
+            variant='outlined'
+            type="submit"
+            loading={isSubmitting}
+          >Guardar
           </Button>
         </Box>
         </form>
@@ -92,14 +152,3 @@ export default function AddPlace() {
     </Container>
   )
 }
-
-
-
-
-// <iframe
-// title="Google Map"
-// src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387190.2799181496!2d-93.2146422!3d17.9794344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d32e8b1b4ef77b%3A0xc76ed3b6d5042a97!2sTabasco!5e0!3m2!1ses!2smx!4v1676187192837!5m2!1ses!2smx"
-// style={{ width: '100%', height: '300px', border: 0 }}
-// allowFullScreen
-// loading="lazy"
-// />

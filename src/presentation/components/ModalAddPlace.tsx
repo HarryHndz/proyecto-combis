@@ -1,36 +1,81 @@
 import { IPlace } from "@/domain/entities/IPlaces"
-import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField } from "@mui/material"
-import { useState } from "react"
+import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material"
+import { useState,useRef,useEffect, } from "react"
+import mapboxgl from 'mapbox-gl'
+import { ACCESS_TOKEN } from "../utils/constants"
 
 interface IPropsModalAddPlace {
   setPlaces:(value:IPlace[])=>void
   places:IPlace[]
+  handleAdd:(balues:IPlace[])=>void
+  latitudeCurrent?:number,
+  longitudeCurrent?:number
 }
 
-export const ModalAddPlace =  ({places,setPlaces}:IPropsModalAddPlace)=>{
+export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longitudeCurrent}:IPropsModalAddPlace)=>{
   const [openModal,setOpenModal] = useState<boolean>(false)
+  const mapRef = useRef<mapboxgl.Map>()
+  const mapContainerRef = useRef<HTMLDivElement>()
   const [values,setValues] = useState<IPlace>({
-    latitude:'-100',
-    longitude:'100',
+    latitude:latitudeCurrent ?? -12.047890,
+    longitude:longitudeCurrent ?? -77.043456,
     name:'',
-    order:''
+    order:0
   })
   const addNewRoute = ()=>{
-    setPlaces([...places,values])
+    console.log("valfinal",values);
+    
+    const updatePlaces = [...places,values]
+    console.log("upd",updatePlaces);
+    setPlaces(updatePlaces)
+    handleAdd(updatePlaces)
     setValues({
       ...values,
       name:'',
-      order:''
+      order:0
     })
     setOpenModal(false)
   }
+
+
+  useEffect(()=>{
+    if (latitudeCurrent && longitudeCurrent){
+      setValues({...values,latitude:latitudeCurrent,longitude:longitudeCurrent})
+    }
+    if (openModal) {
+      mapboxgl.accessToken = ACCESS_TOKEN
+      const timeOut = setTimeout(()=>{
+        mapRef.current = new mapboxgl.Map({
+          container: mapContainerRef.current,
+          style:'mapbox://styles/mapbox/streets-v11',
+          center:{
+            lat:values.latitude,
+            lng:values.longitude
+          },
+          zoom:10.12,
+        })
+        mapRef.current.on('click',(e)=>{
+          setValues({
+            ...values,
+            latitude:e.lngLat.lat,
+            longitude:e.lngLat.lng
+          })   
+      })},400)
+      return()=>{
+        clearTimeout(timeOut)
+        mapRef.current.remove()
+      }
+    }
+
+  },[openModal,latitudeCurrent,longitudeCurrent])
+  
   return(
     <>
       <Button 
-        fullWidth
+        sx={{width:'70px',height:'40px'}}
         variant='outlined'
         onClick={()=>setOpenModal(true)}
-        >Agregar Ruta
+        >Agregar
       </Button>
       <Dialog
         open={openModal}
@@ -65,16 +110,11 @@ export const ModalAddPlace =  ({places,setPlaces}:IPropsModalAddPlace)=>{
             variant="standard"
             onChange={(e)=>setValues({
               ...values,
-              order:e.target.value
+              order:parseInt(e.target.value)
             })}
           />
-          <iframe
-            title="Google Map"
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d387190.2799181496!2d-93.2146422!3d17.9794344!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d32e8b1b4ef77b%3A0xc76ed3b6d5042a97!2sTabasco!5e0!3m2!1ses!2smx!4v1676187192837!5m2!1ses!2smx"
-            style={{ width: '300px', height: '300px', border: 0 }}
-            allowFullScreen
-            loading="lazy"
-          />
+          <div id="map-container" ref={mapContainerRef} style={{width:'100%',height:'300px'}} />
+          <Typography>{`Latitud:${values.latitude} - Longitud:${values.longitude}`}</Typography>
         </DialogContent>
         <DialogActions>
           <Button onClick={()=>setOpenModal(false)}>Cancel</Button>
