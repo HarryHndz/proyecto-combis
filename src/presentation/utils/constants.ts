@@ -15,16 +15,16 @@ const SEX:IValues<string>[] =[
 
 const USERS:IValues<IUserType>[] = [
   {
-  label:'Pasajero',
-  value:'passengers'
+  label:'Dueño de combi',
+  value:'2'
   },
   {
-  label:'Chofer',
-  value:'driver'
+  label:'Conductor',
+  value:'3'
   },
   {
-  label:'Dueño',
-  value:'boss'
+  label:'Checador',
+  value:'4'
   },
 ]
 

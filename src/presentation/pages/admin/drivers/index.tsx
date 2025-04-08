@@ -22,282 +22,43 @@ import {
 import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface Persona {
-  id: number;
-  nombre: string;
-  apellido_pa: string;
-  apellido_ma: string;
-  fecha_nacimiento: string;
-  correo: string;
-}
-
-function createData(
-  id: number,
-  nombre: string,
-  apellido_pa: string,
-  apellido_ma: string,
-  fecha_nacimiento: string,
-  correo: string
-): Persona {
-  return { id, nombre, apellido_pa, apellido_ma, fecha_nacimiento, correo };
-}
-
-const data: Persona[] = [
-  createData(
-    1,
-    "Juan",
-    "García",
-    "López",
-    "1990-05-15",
-    "juan.garcia@example.com"
-  ),
-  createData(
-    2,
-    "María",
-    "Martínez",
-    "Gómez",
-    "1985-08-22",
-    "maria.martinez@example.com"
-  ),
-  createData(
-    3,
-    "Carlos",
-    "Rodríguez",
-    "Hernández",
-    "1992-03-10",
-    "carlos.rodriguez@example.com"
-  ),
-  createData(4, "Ana", "López", "Pérez", "1988-11-30", "ana.lopez@example.com"),
-  createData(
-    5,
-    "Luis",
-    "Gómez",
-    "Gutiérrez",
-    "1995-07-25",
-    "luis.gomez@example.com"
-  ),
-  createData(
-    6,
-    "Laura",
-    "Pérez",
-    "Sánchez",
-    "1991-09-12",
-    "laura.perez@example.com"
-  ),
-  createData(
-    7,
-    "Pedro",
-    "Hernández",
-    "Ramírez",
-    "1987-04-18",
-    "pedro.hernandez@example.com"
-  ),
-  createData(
-    8,
-    "Sofía",
-    "Sánchez",
-    "Torres",
-    "1993-12-05",
-    "sofia.sanchez@example.com"
-  ),
-  createData(
-    9,
-    "Jorge",
-    "Ramírez",
-    "Flores",
-    "1989-06-20",
-    "jorge.ramirez@example.com"
-  ),
-  createData(
-    10,
-    "Diana",
-    "Torres",
-    "Vargas",
-    "1994-02-14",
-    "diana.torres@example.com"
-  ),
-  createData(
-    11,
-    "Fernando",
-    "Flores",
-    "Díaz",
-    "1996-10-08",
-    "fernando.flores@example.com"
-  ),
-  createData(
-    12,
-    "Gabriela",
-    "Vargas",
-    "Morales",
-    "1986-01-25",
-    "gabriela.vargas@example.com"
-  ),
-  createData(
-    13,
-    "Ricardo",
-    "Díaz",
-    "Ortega",
-    "1997-07-30",
-    "ricardo.diaz@example.com"
-  ),
-  createData(
-    14,
-    "Patricia",
-    "Morales",
-    "Cruz",
-    "1998-03-22",
-    "patricia.morales@example.com"
-  ),
-  createData(
-    15,
-    "Oscar",
-    "Ortega",
-    "Reyes",
-    "1984-09-17",
-    "oscar.ortega@example.com"
-  ),
-  createData(
-    16,
-    "Lucía",
-    "Cruz",
-    "Jiménez",
-    "1999-05-11",
-    "lucia.cruz@example.com"
-  ),
-  createData(
-    17,
-    "Manuel",
-    "Reyes",
-    "Mendoza",
-    "1983-12-03",
-    "manuel.reyes@example.com"
-  ),
-  createData(
-    18,
-    "Adriana",
-    "Jiménez",
-    "Aguilar",
-    "1990-08-19",
-    "adriana.jimenez@example.com"
-  ),
-  createData(
-    19,
-    "Roberto",
-    "Mendoza",
-    "Castillo",
-    "1982-04-27",
-    "roberto.mendoza@example.com"
-  ),
-  createData(
-    20,
-    "Isabel",
-    "Aguilar",
-    "Ruiz",
-    "1991-11-14",
-    "isabel.aguilar@example.com"
-  ),
-  createData(
-    21,
-    "Francisco",
-    "Castillo",
-    "Alvarado",
-    "1981-06-09",
-    "francisco.castillo@example.com"
-  ),
-  createData(
-    22,
-    "Carmen",
-    "Ruiz",
-    "Ramos",
-    "1992-02-28",
-    "carmen.ruiz@example.com"
-  ),
-  createData(
-    23,
-    "Antonio",
-    "Alvarado",
-    "Medina",
-    "1980-10-15",
-    "antonio.alvarado@example.com"
-  ),
-  createData(
-    24,
-    "Alejandra",
-    "Ramos",
-    "Guerrero",
-    "1993-07-23",
-    "alejandra.ramos@example.com"
-  ),
-  createData(
-    25,
-    "Miguel",
-    "Medina",
-    "Rojas",
-    "1989-03-18",
-    "miguel.medina@example.com"
-  ),
-  createData(
-    26,
-    "Teresa",
-    "Guerrero",
-    "Silva",
-    "1994-09-05",
-    "teresa.guerrero@example.com"
-  ),
-  createData(
-    27,
-    "José",
-    "Rojas",
-    "Vega",
-    "1987-05-29",
-    "jose.rojas@example.com"
-  ),
-  createData(
-    28,
-    "Elena",
-    "Silva",
-    "Campos",
-    "1995-01-12",
-    "elena.silva@example.com"
-  ),
-  createData(
-    29,
-    "Raúl",
-    "Vega",
-    "Ortiz",
-    "1988-08-07",
-    "raul.vega@example.com"
-  ),
-  createData(
-    30,
-    "Claudia",
-    "Campos",
-    "Soto",
-    "1996-04-01",
-    "claudia.campos@example.com"
-  ),
-];
+import { AdminUseCases } from "@/domain/useCases/adminUseCases";
+import { AdminRepository } from "@/data/repository/adminRepository";
+import { IDrivePerson } from "@/domain/entities/IDriver";
 
 export default function Drivers() {
+  const [data, setData] = useState<IDrivePerson[]>([])
+  const adminRepository = new AdminUseCases(new AdminRepository)
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const chofe = await adminRepository.getChoferes()
+      setData(chofe.data)
+      console.log(chofe);
+      
+    }
+
+    fetchData()
+  }, [])
+
   const [order, setOrder] = useState<"asc" | "desc">("asc");
-  const [orderBy, setOrderBy] = useState<keyof Persona>("id");
+  const [orderBy, setOrderBy] = useState<keyof IDrivePerson>("id_usuario");
   const [page, setPage] = useState(0);
   const [rowsPerPage] = useState(10);
   const [menuAnchor, setMenuAnchor] = useState<null | HTMLElement>(null);
-  const [selectedPerson, setSelectedPerson] = useState<Persona | null>(null);
+  const [selectedPerson, setSelectedPerson] = useState<IDrivePerson | null>(null);
   const [openDeleteDialog, setOpenDeleteDialog] = useState(false);
   const navigate = useNavigate();
 
-  const handleRequestSort = (property: keyof Persona) => {
+  const handleRequestSort = (property: keyof IDrivePerson) => {
     const isAsc = orderBy === property && order === "asc";
     setOrder(isAsc ? "desc" : "asc");
     setOrderBy(property);
   };
 
-  const sortedData = [...data].sort((a, b) => {
+  const sortedData = [...(data || [])].sort((a, b) => {
     if (a[orderBy] < b[orderBy]) return order === "asc" ? -1 : 1;
     if (a[orderBy] > b[orderBy]) return order === "asc" ? 1 : -1;
     return 0;
@@ -305,7 +66,7 @@ export default function Drivers() {
 
   const handleOpenMenu = (
     event: React.MouseEvent<HTMLButtonElement>,
-    person: Persona
+    person: IDrivePerson
   ) => {
     setMenuAnchor(event.currentTarget);
     setSelectedPerson(person);
@@ -317,12 +78,12 @@ export default function Drivers() {
   };
 
   const handleModify = () => {
-    if (selectedPerson) navigate(`modify/${selectedPerson.id}`);
+    if (selectedPerson) navigate(`modify/${selectedPerson.id_usuario}`);
     handleCloseMenu();
   };
 
   const handleViewDetails = () => {
-    if (selectedPerson) navigate(`details/${selectedPerson.id}`);
+    if (selectedPerson) navigate(`details/${selectedPerson.id_usuario}`);
     handleCloseMenu();
   };
 
@@ -337,7 +98,7 @@ export default function Drivers() {
   };
 
   const handleConfirmDelete = () => {
-    console.log(`Eliminando usuario con ID: ${selectedPerson?.id}`);
+    console.log(`Eliminando usuario con ID: ${selectedPerson?.id_usuario}`);
     setOpenDeleteDialog(false);
   };
 
@@ -380,7 +141,7 @@ export default function Drivers() {
                   <TableSortLabel
                     active={orderBy === column}
                     direction={orderBy === column ? order : "asc"}
-                    onClick={() => handleRequestSort(column as keyof Persona)}
+                    onClick={() => handleRequestSort(column as keyof IDrivePerson)}
                   >
                     {column.toUpperCase()}
                   </TableSortLabel>
@@ -394,15 +155,15 @@ export default function Drivers() {
             {sortedData
               .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
               .map((person) => (
-                <TableRow key={person.id}>
-                  <TableCell align="center">{person.id}</TableCell>
-                  <TableCell align="center">{person.nombre}</TableCell>
-                  <TableCell align="center">{person.apellido_pa}</TableCell>
-                  <TableCell align="center">{person.apellido_ma}</TableCell>
+                <TableRow key={person.id_conductor}>
+                  <TableCell align="center">{person.id_conductor}</TableCell>
+                  <TableCell align="center">{person.usuarios.personas.nombre}</TableCell>
+                  <TableCell align="center">{person.usuarios.personas.apellido_pat}</TableCell>
+                  <TableCell align="center">{person.usuarios.personas.apellido_mat}</TableCell>
                   <TableCell align="center">
-                    {person.fecha_nacimiento}
+                    {person.usuarios.personas.fecha_nac}
                   </TableCell>
-                  <TableCell align="center">{person.correo}</TableCell>
+                  <TableCell align="center">{person.usuarios.correo}</TableCell>
                   <TableCell align="center">
                     <IconButton
                       onClick={(event) => handleOpenMenu(event, person)}
