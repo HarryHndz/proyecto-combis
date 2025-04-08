@@ -1,25 +1,34 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, Box, Typography, useTheme } from "@mui/material";
-import ImageIcon from "@mui/icons-material/Image"; 
-import UploadIcon from "@mui/icons-material/CloudUpload"; 
-import DeleteIcon from "@mui/icons-material/Delete"; 
+import ImageIcon from "@mui/icons-material/Image";
+import UploadIcon from "@mui/icons-material/CloudUpload";
+import DeleteIcon from "@mui/icons-material/Delete";
 
-const ImageUpload = () => {
-  const [selectedImage, setSelectedImage] = useState<File | null>(null);
-  const [preview, setPreview] = useState<string | null>(null);
-  const theme = useTheme(); 
+interface ImageUploadProps {
+  onImageChange: (file: File | null) => void;
+  initialImage?: string; 
+}
+
+const ImageUpload: React.FC<ImageUploadProps> = ({ onImageChange, initialImage }) => {
+  const [preview, setPreview] = useState<string | null>(initialImage || null);
+  const theme = useTheme();
+
+  useEffect(() => {
+    setPreview(initialImage || null);
+  }, [initialImage]);
 
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
       const file = event.target.files[0];
-      setSelectedImage(file);
+
       setPreview(URL.createObjectURL(file));
+      onImageChange(file);
     }
   };
 
   const handleRemoveImage = () => {
-    setSelectedImage(null);
     setPreview(null);
+    onImageChange(null);
   };
 
   return (
@@ -34,7 +43,6 @@ const ImageUpload = () => {
         backgroundColor: theme.palette.mode === "dark" ? "#1e1e1e" : "#ffffff",
       }}
     >
-
       <Box
         sx={{
           width: 200,
@@ -52,10 +60,10 @@ const ImageUpload = () => {
           mb: 2,
         }}
       >
-        {selectedImage ? (
+        {preview ? (
           <Box
             component="img"
-            src={preview as string}
+            src={preview}
             alt="Vista previa"
             sx={{
               width: "100%",
@@ -94,7 +102,7 @@ const ImageUpload = () => {
           </Button>
         </label>
 
-        {selectedImage && (
+        {preview && (
           <Button
             fullWidth
             variant="outlined"
