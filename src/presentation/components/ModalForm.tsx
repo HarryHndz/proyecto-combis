@@ -7,37 +7,59 @@ import {
   Typography,
   Box,
   CircularProgress,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
 } from "@mui/material";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { FormField } from "@/presentation/components/FormField";
 import { useVehicleFormikForm } from "@/presentation/hooks/useFormikCombis";
 import validationSchema from "@/domain/validation/VehiclesValidation";
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
 import CustomAlert from "@/presentation/components/alert";
 import useVehiclesData from "@/presentation/hooks/useVehiclesData";
-import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
-import { IUser } from "@/domain/entities/IAuth";
-import { LocalStoreRepository } from "@/data/repository/localRepository";
+import { PlaceUseCases } from "@/domain/useCases/placeUseCases";
+import { IRoute } from "@/domain/entities/IPlaces";
 
 interface VehicleFormModalProps {
   open: boolean;
   onClose: () => void;
   onSuccess?: () => void;
+  idDueno?: number;
 }
 
-const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) => {
-  const [showAlert, setShowAlert] = useState(false);
+const VehicleFormModal = ({
+  open,
+  onClose,
+  onSuccess,
+  idDueno,
+}: VehicleFormModalProps) => {
   const [alertData, setAlertData] = useState<{
     severity: "success" | "error";
     title: string;
     message: string;
   } | null>(null);
 
+  const [routes, setRoutes] = useState<IRoute[]>([]);
   const { registerVehicle, loading } = useVehiclesData();
-  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository())
-  const storedId = typeof window !== "undefined" ? localRepository.get('user') : null;
-  const idDueno = storedId?.id
+
+  useEffect(() => {
+    const fetchRoutes = async () => {
+      try {
+        const useCase = new PlaceUseCases();
+        const fetchedRoutes = await useCase.getRoutes();
+        setRoutes(fetchedRoutes);
+      } catch (error) {
+        console.error("Error al obtener rutas:", error);
+      }
+    };
+
+    if (open) {
+      fetchRoutes();
+    }
+  }, [open]);
 
   useEffect(() => {
     if (!idDueno && open) {
@@ -46,15 +68,14 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
         title: "ID no encontrado",
         message: "No se encontró el ID del dueño. Intenta iniciar sesión nuevamente.",
       });
-      setShowAlert(true);
     }
   }, [idDueno, open]);
 
   const initialValues: Partial<IRegisterVehicle> = {
+    id_dueno: idDueno,
+    id_ruta: undefined,
     numero: "",
     matricula: "",
-    id_dueno: idDueno ?? undefined,
-    id_ruta: undefined,
   };
 
   const {
@@ -84,21 +105,19 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
           title: "Registro exitoso",
           message: "La combi se ha registrado correctamente.",
         });
-        setShowAlert(true);
 
         setTimeout(() => {
-          setShowAlert(false);
           resetForm();
+          setAlertData(null);
           onClose();
           onSuccess?.();
-        }, 2500);
+        }, 2000);
       } catch {
         setAlertData({
           severity: "error",
           title: "Error",
           message: "Ocurrió un error al registrar la combi. Intenta nuevamente.",
         });
-        setShowAlert(true);
       }
     },
   });
@@ -107,7 +126,6 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
     if (open) {
       resetForm();
       setAlertData(null);
-      setShowAlert(false);
     }
   }, [open, resetForm]);
 
@@ -125,12 +143,12 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
       </DialogTitle>
 
       <DialogContent dividers>
-        {showAlert && alertData && (
+        {alertData && (
           <CustomAlert
             severity={alertData.severity}
             title={alertData.title}
             message={alertData.message}
-            onClose={() => setShowAlert(false)}
+            onClose={() => setAlertData(null)}
           />
         )}
 
@@ -161,6 +179,30 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
             error={touched.matricula && Boolean(errors.matricula)}
             helperText={touched.matricula && errors.matricula}
           />
+
+          <FormControl fullWidth error={touched.id_ruta && Boolean(errors.id_ruta)}>
+            <InputLabel id="route-select-label">Ruta</InputLabel>
+            <Select
+              labelId="route-select-label"
+              id="route-select"
+              name="id_ruta"
+              value={values.id_ruta || ""}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              label="Ruta"
+            >
+              {routes.map((route) => (
+                <MenuItem key={route.id} value={route.id}>
+                  {route.name}
+                </MenuItem>
+              ))}
+            </Select>
+            {touched.id_ruta && errors.id_ruta && (
+              <Typography variant="caption" color="error">
+                {errors.id_ruta}
+              </Typography>
+            )}
+          </FormControl>
         </Box>
       </DialogContent>
 
@@ -170,11 +212,14 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
         </Button>
         <Button
           type="submit"
-          onClick={() => handleSubmit()}
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
           variant="contained"
           color="primary"
           disabled={isSubmitting || loading}
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          startIcon={loading && <CircularProgress size={20} color="inherit" />}
         >
           {loading ? "Registrando..." : "Enviar"}
         </Button>
@@ -185,4 +230,4 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
 
 export default VehicleFormModal;
 export { VehicleFormModal };
-export type { VehicleFormModalProps };  
+export type { VehicleFormModalProps };

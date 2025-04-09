@@ -1,8 +1,17 @@
-import { Box, CircularProgress, Typography, Dialog, DialogActions, DialogContent, DialogTitle, Button } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Button,
+} from '@mui/material';
 import { DataGrid, GridColDef } from '@mui/x-data-grid';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useVehiclesData } from '@/presentation/hooks/useVehiclesData'; 
+import { useVehiclesData } from '@/presentation/hooks/useVehiclesData';
 import IconButton from '@mui/material/IconButton';
 import MoreVertIcon from '@mui/icons-material/MoreVert';
 import Menu from '@mui/material/Menu';
@@ -24,19 +33,21 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
   };
 
   const handleDelete = async () => {
+    if (loadingDelete) return; // Previene doble clic o doble ejecución
+  
     setLoadingDelete(true);
     try {
       await deleteVehicle(idVehiculo);
       await fetchVehicles();
-      setOpenDialog(false);
       console.log(`Vehículo ${idVehiculo} eliminado`);
     } catch (error) {
-      setOpenDialog(false);
       console.error("Error al eliminar el vehículo:", error);
     } finally {
+      setOpenDialog(false); // mover aquí por si hay error también
       setLoadingDelete(false);
     }
   };
+  
 
   return (
     <>
@@ -44,15 +55,14 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem onClick={() => { handleClose(); console.log(`Ver detalles de ${idVehiculo}`); }}>Ver detalles</MenuItem>
-        <MenuItem onClick={() => { 
-          handleClose(); 
-          console.log(`Actualizar ${idVehiculo}`);
-          navigate('/transport/update');
+        <MenuItem onClick={() => {
+          handleClose();
+          console.log(`Ver detalles de ${idVehiculo}`);
+          navigate(`/admin/transport/details/${idVehiculo}`);
         }}>
-          Actualizar
+          Ver detalles
         </MenuItem>
-        <MenuItem onClick={() => { 
+        <MenuItem onClick={() => {
           handleClose();
           setOpenDialog(true);
         }}>
@@ -80,22 +90,48 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
   );
 };
 
-const columns: GridColDef[] = [
-  { field: 'id_vehiculos', headerName: 'Id vehículo', flex: 1, headerAlign: 'center', align: 'center' },
-  { field: 'numero', headerName: 'Número', flex: 1, headerAlign: 'center', align: 'center' },
-  { field: 'matricula', headerName: 'Matrícula', flex: 1, headerAlign: 'center', align: 'center' },
-  {
-    field: 'acciones',
-    headerName: 'Acciones',
-    flex: 0.5,
-    headerAlign: 'center',
-    align: 'center',
-    renderCell: (params) => <ActionsMenu idVehiculo={params.row.id_vehiculos.toString()} />,
-  },
-];
-
 export default function DataGridVehiculos() {
-  const { vehicles, loading, error } = useVehiclesData();  
+  const { vehicles, loading, error, updateVehicle } = useVehiclesData();
+
+  const handleRowUpdate = async (newRow: any, oldRow: any) => {
+    try {
+      if (
+        newRow.numero !== oldRow.numero ||
+        newRow.matricula !== oldRow.matricula
+      ) {
+        const updatedVehicle = {
+          ...newRow,
+          id_vehiculos: newRow.id_vehiculos,
+        };
+
+        console.log("🧾 Datos a enviar al backend:", updatedVehicle);
+        await updateVehicle(newRow.id_vehiculos, updatedVehicle);
+        console.log("🚀 Vehículo actualizado desde el grid.");
+      }
+
+      return newRow;
+    } catch (error) {
+      console.error("❌ Error actualizando desde el grid:", error);
+      return oldRow;
+    }
+  };
+
+  const columns: GridColDef[] = [
+    { field: 'id_vehiculos', headerName: 'Id vehículo', flex: 1, headerAlign: 'center', align: 'center' },
+    { field: 'numero', headerName: 'Número', flex: 1, headerAlign: 'center', align: 'center', editable: true },
+    { field: 'matricula', headerName: 'Matrícula', flex: 1, headerAlign: 'center', align: 'center', editable: true },
+    {
+      field: 'acciones',
+      headerName: 'Acciones',
+      flex: 0.5,
+      headerAlign: 'center',
+      align: 'center',
+      sortable: false,
+      filterable: false,
+      disableColumnMenu: true,
+      renderCell: (params) => <ActionsMenu idVehiculo={params.row.id_vehiculos.toString()} />,
+    },
+  ];
 
   if (loading) {
     return (
@@ -119,17 +155,19 @@ export default function DataGridVehiculos() {
     <Box sx={{ height: 500, width: '100%', display: 'flex', justifyContent: 'center' }}>
       <Box sx={{ width: '90%', maxWidth: 1100 }}>
         <DataGrid
-          rows={vehicles}  
-          columns={columns}  
-          getRowId={(row) => row.id_vehiculos} // Aquí está la modificación
+          rows={vehicles}
+          columns={columns}
+          getRowId={(row) => row.id_vehiculos}
           autoHeight
+          checkboxSelection
+          disableRowSelectionOnClick
+          processRowUpdate={handleRowUpdate}
+          experimentalFeatures={{}}
           initialState={{
             pagination: {
               paginationModel: { pageSize: 10 },
             },
           }}
-          checkboxSelection
-          disableRowSelectionOnClick
         />
       </Box>
     </Box>

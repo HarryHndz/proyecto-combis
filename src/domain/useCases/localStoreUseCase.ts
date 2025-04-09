@@ -5,7 +5,7 @@ export class LocalStoreUseCase<T> implements LocalStoreInterface<T>{
   private localRepository:LocalStoreRepository<T>
   constructor(repository:LocalStoreRepository<T>){
     this.localRepository = repository
-  }
+  } 
   save(key: string, value: T): void {
     this.localRepository.save(key,value)
   }
