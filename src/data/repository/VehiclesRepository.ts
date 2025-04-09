@@ -7,25 +7,28 @@ export class VehicleRepository {
   private httpClient;
   private localStoreUseCase: LocalStoreUseCase<any>;
 
-  constructor(localStoreUseCase: LocalStoreUseCase<any> = new LocalStoreUseCase(new LocalStoreRepository()), httpClient: ApiClient = new ApiClient()) {
+  constructor(
+    localStoreUseCase: LocalStoreUseCase<any> = new LocalStoreUseCase(new LocalStoreRepository()),
+    httpClient: ApiClient = new ApiClient()
+  ) {
     this.httpClient = httpClient;
     this.localStoreUseCase = localStoreUseCase;
   }
 
   // Método para obtener el id del dueño de forma centralizada
   private getOwnerId(): number | null {
-    const userId = this.localStoreUseCase.get(1);
-    if (!userId) {
+    const user = this.localStoreUseCase.get("user"); // Asegúrate de usar la clave correcta
+    if (!user) {
       throw new Error("El usuario no ha iniciado sesión");
     }
-    return userId;
+    return user.id;
   }
 
   // Método para registrar un vehículo
   async registerVehicle(dataRegister: IRegisterVehicle): Promise<void> {
     try {
       const userId = this.getOwnerId(); // Obtener id del dueño
-      await this.httpClient.post('/vehiculos', {
+      await this.httpClient.post("/vehiculos", {
         ...dataRegister,
         id_dueno: userId,
       });
@@ -95,7 +98,7 @@ export class VehicleRepository {
       throw new Error(`Error en el servidor: ${(error as any).response.status}`);
     } else if (error instanceof Error && (error as any).request) {
       console.error(`No se recibió respuesta del servidor al ${action}:`, (error as any).request);
-      throw new Error('Error de red: No se pudo conectar con el servidor');
+      throw new Error("Error de red: No se pudo conectar con el servidor");
     } else {
       console.error(`Error desconocido al ${action}:`, error);
       throw new Error(`Error inesperado al ${action}`);

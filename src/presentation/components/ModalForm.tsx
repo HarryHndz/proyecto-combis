@@ -9,7 +9,7 @@ import {
   CircularProgress,
 } from "@mui/material";
 import DirectionsBusIcon from "@mui/icons-material/DirectionsBus";
-import { useState, useEffect } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { FormField } from "@/presentation/components/FormField";
 import { useVehicleFormikForm } from "@/presentation/hooks/useFormikCombis";
 import validationSchema from "@/domain/validation/VehiclesValidation";
@@ -27,7 +27,6 @@ interface VehicleFormModalProps {
 }
 
 const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) => {
-  const [showAlert, setShowAlert] = useState(false);
   const [alertData, setAlertData] = useState<{
     severity: "success" | "error";
     title: string;
@@ -35,9 +34,12 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
   } | null>(null);
 
   const { registerVehicle, loading } = useVehiclesData();
-  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository())
-  const storedId = typeof window !== "undefined" ? localRepository.get('user') : null;
-  const idDueno = storedId?.id
+
+  const idDueno = useMemo(() => {
+    if (typeof window === "undefined") return null;
+    const repo = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
+    return repo.get("user")?.id ?? null;
+  }, []);
 
   useEffect(() => {
     if (!idDueno && open) {
@@ -46,7 +48,6 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
         title: "ID no encontrado",
         message: "No se encontró el ID del dueño. Intenta iniciar sesión nuevamente.",
       });
-      setShowAlert(true);
     }
   }, [idDueno, open]);
 
@@ -84,21 +85,19 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
           title: "Registro exitoso",
           message: "La combi se ha registrado correctamente.",
         });
-        setShowAlert(true);
 
         setTimeout(() => {
-          setShowAlert(false);
           resetForm();
+          setAlertData(null);
           onClose();
           onSuccess?.();
-        }, 2500);
+        }, 2000);
       } catch {
         setAlertData({
           severity: "error",
           title: "Error",
           message: "Ocurrió un error al registrar la combi. Intenta nuevamente.",
         });
-        setShowAlert(true);
       }
     },
   });
@@ -107,7 +106,6 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
     if (open) {
       resetForm();
       setAlertData(null);
-      setShowAlert(false);
     }
   }, [open, resetForm]);
 
@@ -125,12 +123,12 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
       </DialogTitle>
 
       <DialogContent dividers>
-        {showAlert && alertData && (
+        {alertData && (
           <CustomAlert
             severity={alertData.severity}
             title={alertData.title}
             message={alertData.message}
-            onClose={() => setShowAlert(false)}
+            onClose={() => setAlertData(null)}
           />
         )}
 
@@ -170,11 +168,14 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
         </Button>
         <Button
           type="submit"
-          onClick={() => handleSubmit()}
+          onClick={(e) => {
+            e.preventDefault();
+            handleSubmit();
+          }}
           variant="contained"
           color="primary"
           disabled={isSubmitting || loading}
-          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : null}
+          startIcon={loading && <CircularProgress size={20} color="inherit" />}
         >
           {loading ? "Registrando..." : "Enviar"}
         </Button>
@@ -185,4 +186,4 @@ const VehicleFormModal = ({ open, onClose, onSuccess }: VehicleFormModalProps) =
 
 export default VehicleFormModal;
 export { VehicleFormModal };
-export type { VehicleFormModalProps };  
+export type { VehicleFormModalProps };
