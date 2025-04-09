@@ -11,7 +11,7 @@ export class PlaceRepository implements PlaceInterface{
       const {data} =await this.httpClient.get(`rutas-paradas-orden/${id}/paradas`)
       const info:any[] = data.data.paradas
       const response:IPlaceUpdate[] =  info.map((item)=>({
-        id_place:item.id_ruta,
+        id_place:item.id_parada,
         latitude:item.latitud,
         longitude:item.longitud,
         name:item.nombre,
