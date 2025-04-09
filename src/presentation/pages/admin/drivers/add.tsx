@@ -1,4 +1,4 @@
-/* import { useFormikForm } from "@/presentation/hooks/useFormikValues";
+import { useFormikForm } from "@/presentation/hooks/useFormikValues";
 import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material";
 import validationSchema from "@/domain/validation/driverRegister";
 import { useNavigate } from "react-router-dom";
@@ -226,4 +226,4 @@ export default function AddDriver() {
       </Paper>
     </Box>
   );
-} */
+}

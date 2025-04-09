@@ -1,107 +1,103 @@
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
 import { ApiClient } from "@/data/apiClient";
-import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
-import { LocalStoreRepository } from "@/data/repository/localRepository";
 
 export class VehicleRepository {
   private httpClient;
-  private localStoreUseCase: LocalStoreUseCase<any>;
 
-  constructor(
-    localStoreUseCase: LocalStoreUseCase<any> = new LocalStoreUseCase(new LocalStoreRepository()),
-    httpClient: ApiClient = new ApiClient()
-  ) {
-    this.httpClient = httpClient;
-    this.localStoreUseCase = localStoreUseCase;
+  constructor() {
+    this.httpClient = new ApiClient().getInstance();
   }
 
-  // Método para obtener el id del dueño de forma centralizada
-  private getOwnerId(): number | null {
-    const user = this.localStoreUseCase.get("user"); // Asegúrate de usar la clave correcta
-    if (!user) {
-      throw new Error("El usuario no ha iniciado sesión");
-    }
-    return user.id;
-  }
-
-  // Método para registrar un vehículo
   async registerVehicle(dataRegister: IRegisterVehicle): Promise<void> {
     try {
-      const userId = this.getOwnerId(); // Obtener id del dueño
-      await this.httpClient.post("/vehiculos", {
-        ...dataRegister,
-        id_dueno: userId,
+      const user = await this.httpClient.get(`/duenos/usuario/${dataRegister.id_dueno}`);
+      console.log("user", user);
+
+      const response = await this.httpClient.post("/vehiculos", {
+        id_dueno: user.data.data.id_dueno,
+        id_ruta: dataRegister.id_ruta,
+        numero: dataRegister.numero,
+        matricula: dataRegister.matricula,
       });
+      console.log("🚀 Response del servidor:", response);
+
+      if (response.status === 201) {
+        console.log("Vehículo registrado correctamente");
+      } else {
+        throw new Error("Error en el registro del vehículo.");
+      }
     } catch (error) {
       this.handleError(error, "registrar el vehículo");
     }
   }
 
-  // Método para obtener todos los vehículos del dueño
-  async getVehicles(): Promise<IRegisterVehicle[]> {
+  async getVehicles(userId: number): Promise<IRegisterVehicle[]> {
     try {
-      const userId = this.getOwnerId();
-      const response = await this.httpClient.get(`/vehiculos?dueno_id=${userId}`);
-      return response.data.data;
+      const userResponse = await this.httpClient.get(`/duenos/usuario/${userId}`);
+      const duenoId = userResponse.data.data.id_dueno;
+      
+      const vehiclesResponse = await this.httpClient.get(`/vehiculos/dueno/${duenoId}`);
+      console.log("🚀 Vehículos obtenidos:", vehiclesResponse);
+      
+      return vehiclesResponse.data.data;
     } catch (error) {
       this.handleError(error, "obtener los vehículos");
-      return [];
     }
   }
 
-  // Método para obtener un vehículo específico por ID
   async getVehicleById(id: string): Promise<IRegisterVehicle> {
     try {
-      const userId = this.getOwnerId();
       const response = await this.httpClient.get(`/vehiculos/${id}`);
-      if (response.data.id_dueno !== userId) {
-        throw new Error("Este vehículo no pertenece al usuario");
-      }
-      return response.data;
+      return response.data.data; // <- Aquí extraes solo la data útil
     } catch (error) {
       this.handleError(error, `obtener los detalles del vehículo ${id}`);
-      return {} as IRegisterVehicle;
     }
   }
+  
 
-  // Método para actualizar un vehículo
   async updateVehicle(id: string, updatedData: IRegisterVehicle): Promise<void> {
     try {
-      const userId = this.getOwnerId();
-      await this.httpClient.put(`/vehiculos/${id}`, {
-        ...updatedData,
-        id_dueno: userId,
+      // Obtener la información del dueño antes de hacer la actualización
+      const user = await this.httpClient.get(`/duenos/usuario/${updatedData.id_dueno}`);
+      console.log("User info:", user);
+  
+      // Hacer la actualización del vehículo con la información del dueño
+      const response = await this.httpClient.patch(`/vehiculos/${id}`, {
+        id_dueno: user.data.data.id_dueno,
+        id_ruta: updatedData.id_ruta,
+        numero: updatedData.numero,
+        matricula: updatedData.matricula,
       });
+  
+      console.log("🚀 Vehículo actualizado correctamente:", response);
+  
+      if (response.status === 200) {
+        console.log("Vehículo actualizado correctamente");
+      } else {
+        throw new Error("Error en la actualización del vehículo.");
+      }
     } catch (error) {
       this.handleError(error, `actualizar el vehículo ${id}`);
     }
   }
 
-  // Método para eliminar un vehículo
-  async deleteVehicle(id: string): Promise<void> {
-    try {
-      const userId = this.getOwnerId();
-      const vehicle = await this.getVehicleById(id);
-      if (vehicle.id_dueno !== userId) {
-        throw new Error("Este vehículo no pertenece al usuario");
+    async deleteVehicle(id: string): Promise<void> {
+      try {
+        // Eliminamos el vehículo directamente sin ninguna validación adicional
+        const response = await this.httpClient.delete(`/vehiculos/${id}`);
+        if (response.status === 200) {
+          console.log("🚀 Vehículo eliminado correctamente desde el repositorio");
+        } else {
+          throw new Error("Error al eliminar el vehículo desde el repositorio.");
+        }
+      } catch (error) {
+        this.handleError(error, `eliminar el vehículo ${id} desde el repositorio`);
+        throw error;  // Lanzar el error para que el use case lo maneje
       }
-      await this.httpClient.delete(`/vehiculos/${id}`);
-    } catch (error) {
-      this.handleError(error, `eliminar el vehículo ${id}`);
     }
-  }
 
-  // Maneja errores comunes
-  private handleError(error: any, action: string): void {
-    if (error instanceof Error && (error as any).response) {
-      console.error(`Error al ${action}:`, (error as any).response.data);
-      throw new Error(`Error en el servidor: ${(error as any).response.status}`);
-    } else if (error instanceof Error && (error as any).request) {
-      console.error(`No se recibió respuesta del servidor al ${action}:`, (error as any).request);
-      throw new Error("Error de red: No se pudo conectar con el servidor");
-    } else {
-      console.error(`Error desconocido al ${action}:`, error);
-      throw new Error(`Error inesperado al ${action}`);
-    }
+  private handleError(error: any, action: string): never {
+    console.error(`Error al ${action}:`, error);
+    throw new Error(`Error al ${action}: ${error.message || "desconocido"}`);
   }
 }

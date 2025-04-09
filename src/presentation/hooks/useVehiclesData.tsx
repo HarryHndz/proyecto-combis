@@ -5,96 +5,74 @@ import { IRegisterVehicle } from "@/domain/entities/IVehicles";
 
 export const useVehiclesData = () => {
   const [vehicles, setVehicles] = useState<IRegisterVehicle[]>([]);
-  const [loadingList, setLoadingList] = useState<boolean>(false); // solo para cargar lista
-  const [loadingAction, setLoadingAction] = useState<boolean>(false); // para crear, editar, eliminar
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Instanciar repositorio y casos de uso solo una vez
   const vehicleRepository = useMemo(() => new VehicleRepository(), []);
   const vehicleUseCases = useMemo(() => new VehicleUseCases(vehicleRepository), [vehicleRepository]);
 
-  // Obtener todos los vehículos
-  const fetchVehicles = useCallback(async (): Promise<void> => {
-    if (loadingList) return;
-
-    setLoadingList(true);
+  const fetchVehicles = useCallback(async () => {
+    setLoading(true);
     setError(null);
 
     try {
-      const response = await vehicleUseCases.getVehicles();
-      if (Array.isArray(response)) {
-        setVehicles(response);
-      } else {
-        setError("No se pudieron cargar los datos correctamente");
-      }
+      const data = await vehicleUseCases.getVehicles();
+      setVehicles(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || "Error al obtener vehículos");
     } finally {
-      setLoadingList(false);
-    }
-  }, [loadingList, vehicleUseCases]);
-
-  // Obtener detalles de un vehículo
-  const getVehicleDetails = useCallback(async (id: string): Promise<IRegisterVehicle | null> => {
-    setLoadingAction(true);
-    setError(null);
-
-    try {
-      const details = await vehicleUseCases.getVehicleDetails(id);
-      return details;
-    } catch (err: any) {
-      setError(err.message || "Error al obtener detalles del vehículo");
-      return null;
-    } finally {
-      setLoadingAction(false);
+      setLoading(false);
     }
   }, [vehicleUseCases]);
 
-  // Registrar nuevo vehículo
-  const registerVehicle = async (vehicleData: Partial<IRegisterVehicle>): Promise<boolean> => {
-    setLoadingAction(true);
+  const getVehicleDetails = useCallback(async (id: string) => {
+    setLoading(true);
     setError(null);
 
     try {
-      if (!vehicleData.id_dueno) {
-        throw new Error("Falta el ID del dueño del vehículo");
-      }
+      return await vehicleUseCases.getVehicleDetails(id);
+    } catch (err: any) {
+      setError(err.message || "Error al obtener detalles");
+      return null;
+    } finally {
+      setLoading(false);
+    }
+  }, [vehicleUseCases]);
 
+  const registerVehicle = async (vehicleData: Partial<IRegisterVehicle>) => {
+    setLoading(true);
+    setError(null);
+
+    try {
       await vehicleUseCases.registerVehicle(vehicleData);
       await fetchVehicles();
       return true;
     } catch (err: any) {
-      setError(err.message || "Error al registrar el vehículo");
+      setError(err.message || "Error al registrar vehículo");
       return false;
     } finally {
-      setLoadingAction(false);
+      setLoading(false);
     }
   };
 
-  // Actualizar vehículo
-  const updateVehicle = async (id: string, vehicleData: Partial<IRegisterVehicle>): Promise<boolean> => {
-    setLoadingAction(true);
+  const updateVehicle = async (id: string, data: Partial<IRegisterVehicle>) => {
+    setLoading(true);
     setError(null);
 
     try {
-      if (!vehicleData.id_dueno) {
-        throw new Error("Falta el ID del dueño del vehículo");
-      }
-
-      await vehicleUseCases.updateVehicle(id, vehicleData);
+      await vehicleUseCases.updateVehicle(id, data);
       await fetchVehicles();
       return true;
     } catch (err: any) {
-      setError(err.message || "Error al actualizar el vehículo");
+      setError(err.message || "Error al actualizar vehículo");
       return false;
     } finally {
-      setLoadingAction(false);
+      setLoading(false);
     }
   };
 
-  // Eliminar vehículo
-  const deleteVehicle = async (id: string): Promise<boolean> => {
-    setLoadingAction(true);
+  const deleteVehicle = async (id: string) => {
+    setLoading(true);
     setError(null);
 
     try {
@@ -102,29 +80,26 @@ export const useVehiclesData = () => {
       await fetchVehicles();
       return true;
     } catch (err: any) {
-      setError(err.message || "Error al eliminar el vehículo");
+      setError(err.message || "Error al eliminar vehículo");
       return false;
     } finally {
-      setLoadingAction(false);
+      setLoading(false);
     }
   };
 
-  // Carga inicial
   useEffect(() => {
     fetchVehicles();
   }, [fetchVehicles]);
 
   return {
     vehicles,
-    loading: loadingList || loadingAction, // loading general si quieres usarlo combinado
-    loadingList,
-    loadingAction,
+    loading,
     error,
+    fetchVehicles,
+    getVehicleDetails,
     registerVehicle,
     updateVehicle,
     deleteVehicle,
-    getVehicleDetails,
-    fetchVehicles,
   };
 };
 

@@ -35,7 +35,7 @@ const Router = () => {
             </Route>
             <Route path="transport">
               <Route path="update" element={<UpdateCombis />} />
-              <Route path ="details/:id" element={<DetailsCombis />} />
+              <Route path="details/:id" element={<DetailsCombis />} />
               <Route index element={<Transport />} />
             </Route>
             <Route path="drivers">
