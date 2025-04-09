@@ -41,6 +41,11 @@ export default function RoutesCombi() {
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       zoom: 10.20,
+      center: {
+        lat: 17.9753722,
+        lng: -92.9465036,
+      }
+
     });
 
     if (placesByRoute.length > 0) {
@@ -75,7 +80,7 @@ export default function RoutesCombi() {
 
   useEffect(() => {
     if (!search) return;
-    const client = mqtt.connect('ws://2.tcp.ngrok.io:12426');
+    const client = mqtt.connect('ws://6.tcp.us-cal-1.ngrok.io:17150');
     setClient(client);
     client.on('connect', () => {
       console.log('🟢 Conectado al broker MQTT');

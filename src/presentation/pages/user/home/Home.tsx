@@ -14,21 +14,73 @@ export default function Home() {
   const mapContainerRef = useRef<HTMLDivElement>()
   const combiMarkersRef = useRef<Record<string, mapboxgl.Marker>>({});
 
-  const [search,setSearch] = useState<IRoute | null>(null)
-  const [placesByRoute,setPlacesByRoute] = useState<IPlaceUpdate[]>([])
+  const [search, setSearch] = useState<IRoute | null>(null)
+  const [placesByRoute, setPlacesByRoute] = useState<IPlaceUpdate[]>([])
+  const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
+
+  useEffect(() => {
+    // Obtener ubicación actual del usuario
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setUserLocation({
+            lat: position.coords.latitude,
+            lng: position.coords.longitude
+          });
+
+          // Centrar el mapa en la ubicación del usuario
+          if (mapRef.current) {
+            mapRef.current.setCenter([position.coords.longitude, position.coords.latitude]);
+          }
+        },
+        (error) => {
+          console.error("Error obteniendo ubicación:", error);
+          // Usar ubicación por defecto si falla
+          setUserLocation({
+            lat: 17.9753722,
+            lng: -92.9465036
+          });
+        }
+      );
+    } else {
+      console.error("Geolocalización no soportada");
+      setUserLocation({
+        lat: 17.9753722,
+        lng: -92.9465036
+      });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!mapRef.current || !userLocation) return;
+    
+    const userMarker = new mapboxgl.Marker({ color: '#3FB1CE' })
+      .setLngLat([userLocation.lng, userLocation.lat])
+      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div style="color:rgb(10, 1, 83); font-weight: bold;">
+          Tu ubicación
+        </div>
+      `))
+      .addTo(mapRef.current);
+  
+    return () => {
+      userMarker.remove();
+    };
+  }, [userLocation]);
+
   useEffect(() => {
     mapboxgl.accessToken = ACCESS_TOKEN
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      zoom:10.20,
-      center:{
-        lat:17.8192384,
-        lng:-91.5308544
+      zoom: 10.20,
+      center: {
+        lat: 17.9753722,
+        lng: -92.9465036,
       }
     });
     if (placesByRoute.length > 0) {
-      placesByRoute.forEach((place)=>{
-        new mapboxgl.Marker().setLngLat([place.longitude,place.latitude]).setPopup(
+      placesByRoute.forEach((place) => {
+        new mapboxgl.Marker().setLngLat([place.longitude, place.latitude]).setPopup(
           new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div style="color:rgb(10, 1, 83); font-weight: bold;">
               ${place.name} <br/>
@@ -54,7 +106,7 @@ export default function Home() {
       } else {
         // Si no existe, creamos uno nuevo y lo guardamos en el ref
         const markerElement = createMarkerWithImage('/combi.jpg'); // ruta de tu imagen
-        const newMarker = new mapboxgl.Marker({ element:markerElement })
+        const newMarker = new mapboxgl.Marker({ element: markerElement })
           .setLngLat([longitude, latitude])
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div style="color:rgb(10, 1, 83); font-weight: bold;">
@@ -69,27 +121,27 @@ export default function Home() {
   }, [messages]);
 
 
-  useEffect(()=>{
-    const getPlacesByRoute = async()=>{
+  useEffect(() => {
+    const getPlacesByRoute = async () => {
       try {
-        if (!search)return
+        if (!search) return
         const repository = new PlaceUseCases()
         const response = await repository.getPlaceByRoute(search.id)
         setPlacesByRoute(response)
-        console.log("response",response);
+        console.log("response", response);
       } catch (error) {
-        console.log("error",error);
-        
+        console.log("error", error);
+
       }
     }
     if (search) {
       getPlacesByRoute()
     }
-  },[search])
+  }, [search])
 
   useEffect(() => {
-    if (!search)return
-    const client = mqtt.connect('ws://2.tcp.ngrok.io:12426');
+    if (!search) return
+    const client = mqtt.connect('ws://6.tcp.us-cal-1.ngrok.io:17150');
     setClient(client)
     client.on('connect', () => {
       console.log('🟢 Conectado al broker MQTT');
@@ -106,9 +158,9 @@ export default function Home() {
     client.on('message', (topic, message) => {
       console.log(`📩 Mensaje recibido en ${topic}:`, message.toString());
       const dataLocation = JSON.parse(message.toString())
-      console.log("aqui",dataLocation);
+      console.log("aqui", dataLocation);
       setMessages((prevMessages) => {
-        const existingIndex = prevMessages.findIndex(msg=> msg.idCombi === dataLocation.idCombi);
+        const existingIndex = prevMessages.findIndex(msg => msg.idCombi === dataLocation.idCombi);
         if (existingIndex !== -1) {
           const updatedMessages = [...prevMessages];
           updatedMessages[existingIndex] = dataLocation;
@@ -136,16 +188,18 @@ export default function Home() {
     el.style.backgroundRepeat = 'no-repeat';
     return el;
   };
-  
-  
+
+
   return (
     <div>
       <div style={{ position: 'relative', height: '100vh' }}>
-      <div id="map-container" ref={mapContainerRef} style={{width:'100%',height:'100vh'}} />
-      <MapCard
-        setRouteValue={setSearch}
-        routeValue={search}
-      />
+        <div id="map-container" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
+        <MapCard
+          setRouteValue={setSearch}
+          routeValue={search}
+          messages={messages}
+          userLocation={userLocation}
+        />
       </div>
     </div>
   );
