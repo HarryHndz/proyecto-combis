@@ -5,98 +5,88 @@ import { IRegisterVehicle } from "@/domain/entities/IVehicles";
 
 export const useVehiclesData = () => {
   const [vehicles, setVehicles] = useState<IRegisterVehicle[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Instanciamos los repositorios y casos de uso una sola vez
   const vehicleRepository = useMemo(() => new VehicleRepository(), []);
   const vehicleUseCases = useMemo(() => new VehicleUseCases(vehicleRepository), [vehicleRepository]);
 
-  // Obtener todos los vehículos
   const fetchVehicles = useCallback(async () => {
-    if (loading) return;
-
     setLoading(true);
     setError(null);
 
     try {
-      const response: IRegisterVehicle[] = await vehicleUseCases.getVehicles();
-
-      if (Array.isArray(response)) {
-        // Puedes conservar todos los datos si necesitas más información
-        setVehicles(response);
-      } else {
-        setError("No se pudieron cargar los datos correctamente");
-      }
+      const data = await vehicleUseCases.getVehicles();
+      setVehicles(Array.isArray(data) ? data : []);
     } catch (err: any) {
       setError(err.message || "Error al obtener vehículos");
     } finally {
       setLoading(false);
     }
-  }, [loading, vehicleUseCases]);
+  }, [vehicleUseCases]);
 
-  // Obtener los detalles de un vehículo específico
-  const getVehicleDetails = useCallback(async (id: string): Promise<IRegisterVehicle | null> => {
+  const getVehicleDetails = useCallback(async (id: string) => {
     setLoading(true);
     setError(null);
 
     try {
-      const details = await vehicleUseCases.getVehicleDetails(id);
-      return details;
+      return await vehicleUseCases.getVehicleDetails(id);
     } catch (err: any) {
-      setError(err.message || "Error al obtener detalles del vehículo");
+      setError(err.message || "Error al obtener detalles");
       return null;
     } finally {
       setLoading(false);
     }
   }, [vehicleUseCases]);
 
-  // Registrar un nuevo vehículo
   const registerVehicle = async (vehicleData: Partial<IRegisterVehicle>) => {
     setLoading(true);
     setError(null);
 
     try {
       await vehicleUseCases.registerVehicle(vehicleData);
-      await fetchVehicles();
+      await fetchVehicles(); // Actualiza el DataGrid automáticamente después de registrar un vehículo
+      return true;
     } catch (err: any) {
-      setError(err.message || "Error al registrar el vehículo");
+      setError(err.message || "Error al registrar vehículo");
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Actualizar un vehículo existente
-  const updateVehicle = async (id: string, vehicleData: Partial<IRegisterVehicle>) => {
+  const updateVehicle = async (id: string, data: Partial<IRegisterVehicle>) => {
     setLoading(true);
     setError(null);
 
     try {
-      await vehicleUseCases.updateVehicle(id, vehicleData);
-      await fetchVehicles();
+      await vehicleUseCases.updateVehicle(id, data);
+      await fetchVehicles(); // Actualiza el DataGrid después de actualizar un vehículo
+      return true;
     } catch (err: any) {
-      setError(err.message || "Error al actualizar el vehículo");
+      setError(err.message || "Error al actualizar vehículo");
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Eliminar un vehículo
   const deleteVehicle = async (id: string) => {
     setLoading(true);
     setError(null);
 
     try {
       await vehicleUseCases.deleteVehicle(id);
-      await fetchVehicles();
+      await fetchVehicles(); // Actualiza el DataGrid después de eliminar un vehículo
+      return true;
     } catch (err: any) {
-      setError(err.message || "Error al eliminar el vehículo");
+      setError(err.message || "Error al eliminar vehículo");
+      return false;
     } finally {
       setLoading(false);
     }
   };
 
-  // Carga inicial de vehículos
   useEffect(() => {
     fetchVehicles();
   }, [fetchVehicles]);
@@ -105,11 +95,11 @@ export const useVehiclesData = () => {
     vehicles,
     loading,
     error,
+    fetchVehicles,
+    getVehicleDetails,
     registerVehicle,
     updateVehicle,
     deleteVehicle,
-    getVehicleDetails,
-    fetchVehicles, // Puedes usar esto como refetch
   };
 };
 

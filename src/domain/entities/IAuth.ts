@@ -3,7 +3,7 @@ export interface IRegister {
   name: string
   paternalSurName: string
   maternalSurName: string
-  gender: string
+  gender: string 
   date: string
   email: string
   password: string
