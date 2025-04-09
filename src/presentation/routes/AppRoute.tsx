@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import Login from "@/presentation/pages/auth/login/Login";
 import Register from "@/presentation/pages/auth/register/Register";
 import Profile from "@/presentation/pages/user/profile/Profile";
@@ -17,11 +17,14 @@ import RegisterCombis from "@/presentation/pages/admin/transport/RegisterCombis"
 import UpdateCombis from "@/presentation/pages/admin/transport/update";
 import UserProfile from "../pages/admin/account";
 import { ProtectedRoute } from "@/domain/validation/userValidation";
+import { RootRedirect } from "@/domain/validation/RootRedirect";
 
 const Router = () => {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<RootRedirect />} />
+
         <Route path="user" element={<DashboardUserLayout />}>
           <Route path="home" index element={<Home />} />
           <Route path="account" element={<Account />} />
@@ -51,6 +54,8 @@ const Router = () => {
           <Route path="register" element={<Register />} />
           <Route index path="login" element={<Login />} />
         </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
 
       </Routes>
     </BrowserRouter>

@@ -8,6 +8,7 @@ interface AuthContextType {
   login: (user: IUser) => void;
   logout: () => void;
   loading: boolean;
+  redirectBasedOnAuth: () => string;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
@@ -23,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (storedUser) {
       try {
         setUser(storedUser);
+
       } catch (error) {
         localRepository.remove('user');
       }
@@ -39,12 +41,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localRepository.remove('user')
   };
 
+  const redirectBasedOnAuth = (): string => {
+    if (user) {
+      return '/admin/';
+    }
+    return '/user/';
+  };
+
   if (loading) {
     return null;
   }
 
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, redirectBasedOnAuth }}>
       {children}
     </AuthContext.Provider>
   );
