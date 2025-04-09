@@ -29,6 +29,11 @@ const NAVIGATION: Navigation = [
     title: 'Cuenta',
     icon: <AccountCircleIcon />,
   },
+  {
+    segment: 'admin/routes',
+    title: 'Rutas',
+    icon: <DirectionsCarIcon />,
+  },
 ];
 
 const demoTheme = createTheme({

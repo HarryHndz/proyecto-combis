@@ -55,7 +55,7 @@ export default function Home() {
   useEffect(() => {
     if (!search)return
 
-    const client = mqtt.connect('ws://8.tcp.ngrok.io:16464');
+    const client = mqtt.connect('ws://0.tcp.ngrok.io:15231');
     setClient(client)
     client.on('connect', () => {
       console.log('🟢 Conectado al broker MQTT');

@@ -18,6 +18,7 @@ import UserProfile from "../pages/admin/account";
 import { ProtectedRoute } from "@/domain/validation/userValidation";
 import DetailsCombis from "../pages/admin/transport/DetailsCombis";
 import { RootRedirect } from "@/domain/validation/RootRedirect";
+import RoutesCombi from "../pages/admin/rutas";
 
 const Router = () => {
   return (
@@ -47,6 +48,7 @@ const Router = () => {
               <Route path="modify/:id" index element={<UpdateDriver />} />
               <Route path="details/:userId" index element={<DetailsDriver />} />
             </Route>
+            <Route path="routes" element={<RoutesCombi />} />
             <Route path="account" index element={<UserProfile />}></Route>
           </Route>
         </Route>

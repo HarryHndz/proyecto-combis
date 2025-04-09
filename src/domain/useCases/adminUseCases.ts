@@ -2,6 +2,7 @@ import { AdminInterface } from "@/domain/repository/adminInterface";
 import { AdminRepository } from "@/data/repository/adminRepository";
 import { IUserRes } from "../entities/IUserRes";
 import { IGetDriver } from "../entities/IDriver";
+import { IDriverCar } from "../entities/IDriverCar";
 
 export class AdminUseCases implements AdminInterface {
   private adminRepository:AdminRepository
@@ -29,6 +30,14 @@ export class AdminUseCases implements AdminInterface {
   async getDataDriver(id: number): Promise<IGetDriver> {
     try {
       return await this.adminRepository.getDataDriver(id)
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async getDataDriverCar(id: number): Promise<IDriverCar> {
+    try {
+      return await this.adminRepository.getDataDriverCar(id)
     } catch (error) {
       throw error
     }
