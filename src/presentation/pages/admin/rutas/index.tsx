@@ -22,44 +22,19 @@ export default function RoutesCombi() {
   const [data, setData] = useState<IDriverCar>();
 
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number, longitude: number } | null>(null);
+  const [locationWatchId, setLocationWatchId] = useState<number | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
       const userLocal = localRepository.get('user')
-      console.log('id', userLocal)
       const user = await adminRepository.getDataDriverCar(Number(userLocal?.id))
       setData(user)
-      console.log('Datos de usuario pero de chofer', user)
     }
     fetchData()
   }, [])
 
   const [search, setSearch] = useState<IRoute | null>(null);
   const [placesByRoute, setPlacesByRoute] = useState<IPlaceUpdate[]>([]);
-  const places = [
-    {
-      id: 1,
-      name: 'Place 1',
-      latitude: -12.04318,
-      longitude: -77.02824,
-      order: 1,
-    },
-    {
-      id: 2,
-      name: 'Place 2',
-      latitude: -12.04518,
-      longitude: -77.03224,
-      order: 2,
-    },
-    {
-      id: 3,
-      name: 'Place 3',
-      latitude: -12.04618,
-      longitude: -77.03624,
-      order: 3,
-    },
-  ]
-
 
   useEffect(() => {
     mapboxgl.accessToken = ACCESS_TOKEN;
@@ -100,7 +75,7 @@ export default function RoutesCombi() {
 
   useEffect(() => {
     if (!search) return;
-    const client = mqtt.connect('ws://0.tcp.ngrok.io:18049');
+    const client = mqtt.connect('ws://2.tcp.ngrok.io:12426');
     setClient(client);
     client.on('connect', () => {
       console.log('🟢 Conectado al broker MQTT');
@@ -122,42 +97,65 @@ export default function RoutesCombi() {
     };
   }, [search]);
 
+
+
+
+
+  // Obtener ubicación actual cada vez que cambie
   useEffect(() => {
-    if (!search || !client) return;
+    if (navigator.geolocation) {
+      const watchId = navigator.geolocation.watchPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setCurrentLocation({ latitude, longitude });
 
-    const interval = setInterval(() => {
-      mapboxgl.accessToken = ACCESS_TOKEN
-      mapRef.current = new mapboxgl.Map({
-        container: mapContainerRef.current,
-        style: 'mapbox://styles/mapbox/streets-v11',
-        center: currentLocation ? [currentLocation.longitude, currentLocation.latitude] : undefined,
-        zoom: 10.12,
-      })
-      mapRef.current.on('click', (e) => {
-        setCurrentLocation({
-          latitude: e.lngLat.lat,
-          longitude: e.lngLat.lng
-        })
-      })
+          // Centrar el mapa en la ubicación actual
+          if (mapRef.current) {
+            mapRef.current.setCenter([longitude, latitude]);
+          }
+        },
+        (error) => {
+          console.error('Error al obtener la ubicación:', error);
+        },
+        { enableHighAccuracy: true, maximumAge: 10000, timeout: 5000 }
+      );
 
-      const locationData = {
-        latitude: currentLocation?.latitude,
-        longitude: currentLocation?.longitude,
-        idCombi: data?.id_conductor,
+      setLocationWatchId(watchId);
+
+      return () => {
+        navigator.geolocation.clearWatch(watchId);
       };
+    } else {
+      console.error('Geolocalización no soportada por este navegador');
+    }
+  }, []);
 
-      client.publish(`ubicacion/ruta/${search.id}`, JSON.stringify(locationData));
-      console.log('📤 Ubicación enviada automáticamente:', locationData);
-    }, 1000);
+  // Enviar ubicación cada 10 segundos
+  useEffect(() => {
+    if (!client || !search) return;
 
-    return () => clearInterval(interval);
-  }, [search, client, places]);
+    const intervalId = setInterval(() => {
+      if (currentLocation) {
+        handlePublish();
+      } else {
+        console.warn('Ubicación actual no disponible');
+      }
+    }, 10000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [client, search, currentLocation]);
+
+
+
 
   const handlePublish = () => {
     if (client && search && currentLocation) {
+      console.log('🟢 Publicando ubicación...', currentLocation);
       const locationData = {
-        latitude: currentLocation.latitude,
-        longitude: currentLocation.longitude,
+        latitude: currentLocation?.latitude,
+        longitude: currentLocation?.longitude,
         idCombi: data?.id_conductor,
       };
 
@@ -176,25 +174,6 @@ export default function RoutesCombi() {
           setRouteValue={setSearch}
           routeValue={search}
         />
-
-        {search && (
-          <button
-            onClick={handlePublish}
-            style={{
-              position: 'absolute',
-              bottom: '20px',
-              right: '20px',
-              padding: '10px 15px',
-              backgroundColor: '#2196F3',
-              color: 'white',
-              border: 'none',
-              borderRadius: '4px',
-              cursor: 'pointer'
-            }}
-          >
-            Compartir mi ubicación
-          </button>
-        )}
       </div>
     </div>
   );
