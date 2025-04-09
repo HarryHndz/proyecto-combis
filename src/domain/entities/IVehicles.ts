@@ -4,7 +4,7 @@ export interface IRegisterVehicle {
   ruta_nombre?: any; // Hacerlo opcional
   id_vehiculos?: number; // Hacerlo opcional
   id_dueno?: number | string; // Permitir tanto number como string
-  ownerName?: string; 
+  id_conductor?: number | string; // Permitir tanto number como string
   id_ruta?: number | string;  // Permitir tanto number como string
   numero?: string; // Hacerlo opcional
   matricula?: string; // Hacerlo opcional

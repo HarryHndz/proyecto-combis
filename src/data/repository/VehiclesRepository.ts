@@ -59,11 +59,9 @@ export class VehicleRepository {
 
   async updateVehicle(id: string, updatedData: IRegisterVehicle): Promise<void> {
     try {
-      // Obtener la información del dueño antes de hacer la actualización
       const user = await this.httpClient.get(`/duenos/usuario/${updatedData.id_dueno}`);
       console.log("User info:", user);
   
-      // Hacer la actualización del vehículo con la información del dueño
       const response = await this.httpClient.patch(`/vehiculos/${id}`, {
         id_dueno: user.data.data.id_dueno,
         id_ruta: updatedData.id_ruta,
@@ -85,7 +83,6 @@ export class VehicleRepository {
 
     async deleteVehicle(id: string): Promise<void> {
       try {
-        // Eliminamos el vehículo directamente sin ninguna validación adicional
         const response = await this.httpClient.delete(`/vehiculos/${id}`);
         if (response.status === 200) {
           console.log("🚀 Vehículo eliminado correctamente desde el repositorio");
@@ -94,7 +91,7 @@ export class VehicleRepository {
         }
       } catch (error) {
         this.handleError(error, `eliminar el vehículo ${id} desde el repositorio`);
-        throw error;  // Lanzar el error para que el use case lo maneje
+         throw error;  // Lanzar el error para que el use case lo maneje
       }
     }
 

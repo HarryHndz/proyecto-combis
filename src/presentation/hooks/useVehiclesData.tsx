@@ -45,7 +45,7 @@ export const useVehiclesData = () => {
 
     try {
       await vehicleUseCases.registerVehicle(vehicleData);
-      await fetchVehicles();
+      await fetchVehicles(); // Actualiza el DataGrid automáticamente después de registrar un vehículo
       return true;
     } catch (err: any) {
       setError(err.message || "Error al registrar vehículo");
@@ -61,7 +61,7 @@ export const useVehiclesData = () => {
 
     try {
       await vehicleUseCases.updateVehicle(id, data);
-      await fetchVehicles();
+      await fetchVehicles(); // Actualiza el DataGrid después de actualizar un vehículo
       return true;
     } catch (err: any) {
       setError(err.message || "Error al actualizar vehículo");
@@ -77,7 +77,7 @@ export const useVehiclesData = () => {
 
     try {
       await vehicleUseCases.deleteVehicle(id);
-      await fetchVehicles();
+      await fetchVehicles(); // Actualiza el DataGrid después de eliminar un vehículo
       return true;
     } catch (err: any) {
       setError(err.message || "Error al eliminar vehículo");

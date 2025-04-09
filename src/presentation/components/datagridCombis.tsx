@@ -33,19 +33,21 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
   };
 
   const handleDelete = async () => {
+    if (loadingDelete) return; // Previene doble clic o doble ejecución
+  
     setLoadingDelete(true);
     try {
       await deleteVehicle(idVehiculo);
       await fetchVehicles();
-      setOpenDialog(false);
       console.log(`Vehículo ${idVehiculo} eliminado`);
     } catch (error) {
-      setOpenDialog(false);
       console.error("Error al eliminar el vehículo:", error);
     } finally {
+      setOpenDialog(false); // mover aquí por si hay error también
       setLoadingDelete(false);
     }
   };
+  
 
   return (
     <>
@@ -53,15 +55,12 @@ const ActionsMenu = ({ idVehiculo }: { idVehiculo: string }) => {
         <MoreVertIcon />
       </IconButton>
       <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleClose}>
-        <MenuItem onClick={() => { handleClose(); console.log(`Ver detalles de ${idVehiculo}`); navigate(`/admin/transport/details/${idVehiculo}`); }}>
-          Ver detalles
-        </MenuItem>
         <MenuItem onClick={() => {
           handleClose();
-          console.log(`Actualizar ${idVehiculo}`);
-          navigate(`/vehicle/update/${idVehiculo}`);
+          console.log(`Ver detalles de ${idVehiculo}`);
+          navigate(`/admin/transport/details/${idVehiculo}`);
         }}>
-          Actualizar
+          Ver detalles
         </MenuItem>
         <MenuItem onClick={() => {
           handleClose();

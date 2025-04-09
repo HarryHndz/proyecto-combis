@@ -1,26 +1,48 @@
-import { Box, CircularProgress, Typography, Button, Stack, Paper, TextField, Divider, IconButton } from '@mui/material';
-import { useParams, useNavigate } from 'react-router-dom';  // Importa useNavigate
+import {
+  Box,
+  CircularProgress,
+  Typography,
+  Button,
+  Stack,
+  Paper,
+  TextField,
+  Divider,
+  IconButton
+} from '@mui/material';
+import {
+  useParams,
+  useNavigate
+} from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import useVehiclesData from '@/presentation/hooks/useVehiclesData';
-import EditRouteComponent from '@/presentation/components/selectupdate';  // Asegúrate de importar el componente
-import { Edit, DirectionsBus, ConfirmationNumber, LocalParking, ArrowBack } from '@mui/icons-material';  // Importar iconos
+import EditRouteComponent from '@/presentation/components/selectupdate';
+import SelectDriverComponent from '@/presentation/components/selectChoferes'; // Asegúrate de que esta ruta sea correcta
+import {
+  Edit,
+  DirectionsBus,
+  ConfirmationNumber,
+  LocalParking,
+  ArrowBack
+} from '@mui/icons-material';
 
 const DetailsCombis = () => {
   const { id } = useParams();
-  const navigate = useNavigate();  // Inicializa useNavigate
+  const navigate = useNavigate();
   const { getVehicleDetails, updateVehicle, loading, error } = useVehiclesData();
+
   const [vehicle, setVehicle] = useState<any | null>(null);
   const [isEditing, setIsEditing] = useState(false);
+
   const [formData, setFormData] = useState<any>({
     numero: '',
     matricula: '',
     id_ruta: '',
+    id_usuario: '', // Nuevo campo para chofer
   });
 
   useEffect(() => {
     const fetchVehicleDetails = async () => {
       if (!id) return;
-
       try {
         const data = await getVehicleDetails(id);
         setVehicle(data || null);
@@ -29,6 +51,7 @@ const DetailsCombis = () => {
             numero: data.numero || '',
             matricula: data.matricula || '',
             id_ruta: data.id_ruta || '',
+            id_usuario: data.id_conductor || '', // Nuevo campo para chofer
           });
         }
       } catch {
@@ -50,43 +73,47 @@ const DetailsCombis = () => {
         numero: vehicle.numero || '',
         matricula: vehicle.matricula || '',
         id_ruta: vehicle.id_ruta || '',
+        id_usuario: vehicle.id_usuario || '',
       });
     }
   };
 
   const handleSave = async () => {
-    if (!id) {
-      console.error("ID is undefined");
-      return;
-    }
+    if (!id) return;
     const isUpdated = await updateVehicle(id, formData);
     if (isUpdated) {
-      // Refrescar los datos después de guardar
-      const updatedVehicle = await getVehicleDetails(id); // Obtener los detalles actualizados
-      setVehicle(updatedVehicle); // Actualizar el estado local con los datos actualizados
-      setIsEditing(false); // Salir del modo de edición
+      const updatedVehicle = await getVehicleDetails(id);
+      setVehicle(updatedVehicle);
+      setIsEditing(false);
     } else {
       console.error("Error al actualizar el vehículo.");
     }
   };
 
   const handleRouteChange = (newRouteId: string) => {
-    setFormData((prevState: any) => ({
-      ...prevState,
+    setFormData((prev: any) => ({
+      ...prev,
       id_ruta: newRouteId,
+    }));
+  };
+
+  const handleDriverChange = (newDriverId: string) => {
+    setFormData((prev: any) => ({
+      ...prev,
+      id_usuario: newDriverId,
     }));
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData((prevState: any) => ({
-      ...prevState,
+    setFormData((prev: any) => ({
+      ...prev,
       [name]: value,
     }));
   };
 
   const handleGoBack = () => {
-    navigate(-1);  // Redirige al usuario a la página anterior
+    navigate(-1);
   };
 
   if (loading) {
@@ -100,9 +127,7 @@ const DetailsCombis = () => {
   if (error) {
     return (
       <Box sx={{ textAlign: 'center', padding: 2 }}>
-        <Typography variant="h6" color="error">
-          {error}
-        </Typography>
+        <Typography variant="h6" color="error">{error}</Typography>
       </Box>
     );
   }
@@ -115,7 +140,7 @@ const DetailsCombis = () => {
             Detalles del Vehículo
           </Typography>
 
-          {/* Icono de Regresar */}
+          {/* Icono de regresar */}
           <IconButton
             onClick={handleGoBack}
             sx={{
@@ -193,8 +218,26 @@ const DetailsCombis = () => {
             ) : (
               <Typography variant="body1">{vehicle.matricula}</Typography>
             )}
+
+            <Divider />
+
+            {/* Chofer */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Typography variant="body1" sx={{ fontWeight: 'bold', marginRight: 1 }}>Chofer:</Typography>
+            </Box>
+            {isEditing ? (
+              <SelectDriverComponent
+                selectedDriver={formData.id_usuario}
+                onDriverChange={handleDriverChange}
+              />
+            ) : (
+              <Typography variant="body1">
+                {vehicle?.usuarios?.personas?.nombre} {vehicle?.usuarios?.personas?.apellido_pat} {vehicle?.usuarios?.personas?.apellido_mat}
+              </Typography>
+            )}
           </Stack>
 
+          {/* Botones */}
           <Box sx={{ marginTop: 2 }}>
             {isEditing ? (
               <>

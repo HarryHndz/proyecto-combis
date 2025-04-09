@@ -104,11 +104,9 @@ async registerVehicle(dataRegister: Partial<IRegisterVehicle>): Promise<void> {
 
   async deleteVehicle(id: string): Promise<void> {
     try {
-      // Intentamos eliminar el vehículo por su ID
       await this.vehicleRepository.deleteVehicle(id);
       console.log("🚀 Vehículo eliminado correctamente");
     } catch (error) {
-      // Manejo de error si ocurre algún problema al eliminar el vehículo
       console.error("Error al eliminar el vehículo:", error);
       throw new Error(`No se pudo eliminar el vehículo con id ${id}`);
     }
