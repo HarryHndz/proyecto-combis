@@ -48,6 +48,8 @@ export class VehicleRepository {
   async getVehicleById(id: string): Promise<IRegisterVehicle> {
     try {
       const response = await this.httpClient.get(`/vehiculos/${id}`);
+    console.log('Respuesta completa del vehículo:', response);
+    console.log('Datos del vehículo extraídos:', response.data.data);
       return response.data.data; // <- Aquí extraes solo la data útil
     } catch (error) {
       this.handleError(error, `obtener los detalles del vehículo ${id}`);

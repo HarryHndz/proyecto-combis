@@ -1,11 +1,13 @@
-import { Box, CircularProgress, Typography, Button, Grid, Paper, TextField } from '@mui/material';
-import { useParams } from 'react-router-dom';
+import { Box, CircularProgress, Typography, Button, Stack, Paper, TextField, Divider, IconButton } from '@mui/material';
+import { useParams, useNavigate } from 'react-router-dom';  // Importa useNavigate
 import { useEffect, useState } from 'react';
 import useVehiclesData from '@/presentation/hooks/useVehiclesData';
 import EditRouteComponent from '@/presentation/components/selectupdate';  // Asegúrate de importar el componente
+import { Edit, DirectionsBus, ConfirmationNumber, LocalParking, ArrowBack } from '@mui/icons-material';  // Importar iconos
 
 const DetailsCombis = () => {
   const { id } = useParams();
+  const navigate = useNavigate();  // Inicializa useNavigate
   const { getVehicleDetails, updateVehicle, loading, error } = useVehiclesData();
   const [vehicle, setVehicle] = useState<any | null>(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -59,7 +61,12 @@ const DetailsCombis = () => {
     }
     const isUpdated = await updateVehicle(id, formData);
     if (isUpdated) {
-      setIsEditing(false); // Exit editing mode
+      // Refrescar los datos después de guardar
+      const updatedVehicle = await getVehicleDetails(id); // Obtener los detalles actualizados
+      setVehicle(updatedVehicle); // Actualizar el estado local con los datos actualizados
+      setIsEditing(false); // Salir del modo de edición
+    } else {
+      console.error("Error al actualizar el vehículo.");
     }
   };
 
@@ -76,6 +83,10 @@ const DetailsCombis = () => {
       ...prevState,
       [name]: value,
     }));
+  };
+
+  const handleGoBack = () => {
+    navigate(-1);  // Redirige al usuario a la página anterior
   };
 
   if (loading) {
@@ -97,59 +108,93 @@ const DetailsCombis = () => {
   }
 
   return (
-    <Box sx={{ display: 'flex', justifyContent: 'center', padding: 3 }}>
+    <Box sx={{ display: 'flex', justifyContent: 'center', padding: 3, position: 'relative' }}>
       {vehicle ? (
         <Paper sx={{ padding: 3, width: '100%', maxWidth: 800 }}>
-          <Typography variant="h5" gutterBottom>Detalles del Vehículo</Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+          <Typography variant="h5" gutterBottom color="primary">
+            Detalles del Vehículo
+          </Typography>
+
+          {/* Icono de Regresar */}
+          <IconButton
+            onClick={handleGoBack}
+            sx={{
+              color: 'primary.main',
+              position: 'absolute',
+              top: 16,
+              left: 16,
+              backgroundColor: 'rgba(0,0,0,0.1)',
+              borderRadius: '50%',
+              padding: 1
+            }}
+          >
+            <ArrowBack />
+          </IconButton>
+
+          <Stack spacing={2}>
+            {/* ID Vehículo */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <LocalParking sx={{ marginRight: 1, color: 'primary.main' }} />
               <Typography variant="body1"><strong>ID Vehículo:</strong> {vehicle.id_vehiculos}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
-              <Typography variant="body1"><strong>ID Dueño:</strong> {vehicle.id_dueno}</Typography>
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Box>
+
+            <Divider />
+
+            {/* Ruta */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <DirectionsBus sx={{ marginRight: 1, color: 'primary.main' }} />
               <Typography variant="body1"><strong>Ruta:</strong></Typography>
-              {isEditing ? (
-                <EditRouteComponent
-                  selectedRoute={formData.id_ruta}
-                  onRouteChange={handleRouteChange}
-                />
-              ) : (
-                <Typography variant="body1">{vehicle.rutas?.nombre}</Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Box>
+            {isEditing ? (
+              <EditRouteComponent
+                selectedRoute={formData.id_ruta}
+                onRouteChange={handleRouteChange}
+              />
+            ) : (
+              <Typography variant="body1">{vehicle.rutas?.nombre}</Typography>
+            )}
+
+            <Divider />
+
+            {/* Número */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <ConfirmationNumber sx={{ marginRight: 1, color: 'primary.main' }} />
               <Typography variant="body1"><strong>Número:</strong></Typography>
-              {isEditing ? (
-                <TextField
-                  fullWidth
-                  value={formData.numero}
-                  onChange={handleChange}
-                  name="numero"
-                  variant="outlined"
-                  margin="normal"
-                />
-              ) : (
-                <Typography variant="body1">{vehicle.numero}</Typography>
-              )}
-            </Grid>
-            <Grid item xs={12} sm={6}>
+            </Box>
+            {isEditing ? (
+              <TextField
+                fullWidth
+                value={formData.numero}
+                onChange={handleChange}
+                name="numero"
+                variant="outlined"
+                margin="normal"
+              />
+            ) : (
+              <Typography variant="body1">{vehicle.numero}</Typography>
+            )}
+
+            <Divider />
+
+            {/* Matrícula */}
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+              <Edit sx={{ marginRight: 1, color: 'primary.main' }} />
               <Typography variant="body1"><strong>Matrícula:</strong></Typography>
-              {isEditing ? (
-                <TextField
-                  fullWidth
-                  value={formData.matricula}
-                  onChange={handleChange}
-                  name="matricula"
-                  variant="outlined"
-                  margin="normal"
-                />
-              ) : (
-                <Typography variant="body1">{vehicle.matricula}</Typography>
-              )}
-            </Grid>
-          </Grid>
+            </Box>
+            {isEditing ? (
+              <TextField
+                fullWidth
+                value={formData.matricula}
+                onChange={handleChange}
+                name="matricula"
+                variant="outlined"
+                margin="normal"
+              />
+            ) : (
+              <Typography variant="body1">{vehicle.matricula}</Typography>
+            )}
+          </Stack>
+
           <Box sx={{ marginTop: 2 }}>
             {isEditing ? (
               <>
