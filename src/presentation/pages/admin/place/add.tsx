@@ -101,15 +101,15 @@ export default function AddPlace() {
           <Box sx={{display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',marginTop:'20px',marginBottom:'5px'}}>
             <Typography variant="h5">Paradas</Typography>
               <ModalAddPlace
-              places={places}
-              setPlaces={setPlaces}
-              handleAdd={(e)=>{
-                console.log("valores",e);
-                setFieldValue('places',e)
-              }}
-              latitudeCurrent={locationCurrent.latitude}
-              longitudeCurrent={locationCurrent.longitude}
-            />
+                places={places}
+                setPlaces={setPlaces}
+                handleAdd={(e)=>{
+                  console.log("valores",e);
+                  setFieldValue('places',e)
+                }}
+                latitudeCurrent={locationCurrent.latitude}
+                longitudeCurrent={locationCurrent.longitude}
+              />
           </Box>
          
            <List sx={{ width: '100%', maxWidth: 360}}>

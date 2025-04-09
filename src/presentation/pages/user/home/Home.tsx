@@ -1,16 +1,18 @@
-import MapCard from "@/presentation/components/CardDashboard";
 import { useEffect, useRef, useState } from "react";
 import mapboxgl from 'mapbox-gl'
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { ACCESS_TOKEN } from "@/presentation/utils/constants";
 import { PlaceUseCases } from "@/domain/useCases/placeUseCases";
 import { IPlaceUpdate, IRoute } from "@/domain/entities/IPlaces";
-// import client from '@/presentation/utils/clientMqtt'
+import mqtt from "mqtt";
+import MapCard from "@/presentation/components/CardDashboard";
 
 export default function Home() {
+  const [client, setClient] = useState<mqtt.MqttClient | null>(null);
+  const [messages, setMessages] = useState<any[]>([]);
   const mapRef = useRef<mapboxgl.Map>()
   const mapContainerRef = useRef<HTMLDivElement>()
-  // const [mensaje, setMensaje] = useState('');
+
   const [search,setSearch] = useState<IRoute | null>(null)
   const [placesByRoute,setPlacesByRoute] = useState<IPlaceUpdate[]>([])
   useEffect(() => {
@@ -50,29 +52,47 @@ export default function Home() {
     }
   },[search])
 
+  useEffect(() => {
+    if (!search)return
 
+    const client = mqtt.connect('ws://8.tcp.ngrok.io:16464');
+    setClient(client)
+    client.on('connect', () => {
+      console.log('🟢 Conectado al broker MQTT');
+      client.subscribe(`ubicacion/ruta/${search.id}`, (err) => {
+        if (!err) {
+          console.log('✅ Suscrito a mi/topic');
+        } else {
+          console.error('❌ Error al suscribirse:', err);
+        }
+      });
+    });
 
-  // useEffect(() => {
-  //   if (search) {
-  //     console.log("entro");
-  //     client.on('connect', () => {
-  //       console.log('Conectado a MQTT');
-  //       client.subscribe(`ubicacion/ruta/${search.id}`);
-  //     })
-  //     client.on('message', (topic, message) => {
-  //       console.log(`Mensaje recibido en ${topic}: ${message.toString()}`);
-  //       setMensaje(message.toString());
-  //     })
+    // Recibir mensajes
+    client.on('message', (topic, message) => {
+      console.log(`📩 Mensaje recibido en ${topic}:`, message.toString());
+      setMessages(prev => [...prev, message.toString()]);
+    });
+
+    client.on('error', (err) => {
+      console.error('🚨 Error MQTT:', err);
+    });
+
+    // Cleanup
+    return () => {
+      client.end();
+    };
+  }, [search]);
+
+  const handlePublish = () => {
+    if (client && search) {
+      client.publish(`ubicacion/ruta/${search.id}`,'prueba')
+    }
+  };
+
+  console.log("mensajes",messages);
   
-  //   }
-  //   return () => {
-  //     client.end();
-  //   };
-  // }, [search]);
 
-  // const sendMessage= () => {
-  //   client.publish('demo/temperatura', '¡Hola desde React!');
-  // };
 
   return (
     <div>
