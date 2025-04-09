@@ -77,11 +77,6 @@ export default function Drivers() {
     setSelectedPerson(null);
   };
 
-  const handleModify = () => {
-    if (selectedPerson) navigate(`modify/${selectedPerson.id_usuario}`);
-    handleCloseMenu();
-  };
-
   const handleViewDetails = () => {
     if (selectedPerson) navigate(`details/${selectedPerson.id_usuario}`);
     handleCloseMenu();
@@ -90,11 +85,6 @@ export default function Drivers() {
   const handleNew = () => {
     navigate("new");
     handleCloseMenu();
-  };
-
-  const handleDelete = () => {
-    setOpenDeleteDialog(true);
-    setMenuAnchor(null);
   };
 
   const handleConfirmDelete = () => {
@@ -191,9 +181,7 @@ export default function Drivers() {
         open={Boolean(menuAnchor)}
         onClose={handleCloseMenu}
       >
-        <MenuItem onClick={handleModify}>Modificar</MenuItem>
         <MenuItem onClick={handleViewDetails}>Ver detalles</MenuItem>
-        <MenuItem onClick={handleDelete}>Eliminar</MenuItem>
       </Menu>
 
       <Dialog
