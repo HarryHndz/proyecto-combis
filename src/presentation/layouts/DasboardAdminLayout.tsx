@@ -65,7 +65,7 @@ export default function DashboardUserLayout(props: DemoProps) {
       window={demoWindow}
       theme={demoTheme}
       >
-      <DashboardLayout>
+      <DashboardLayout branding={{title:'Administrador',logo:''}}>
           <Outlet />
       </DashboardLayout>
     </ReactRouterAppProvider>

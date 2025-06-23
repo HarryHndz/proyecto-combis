@@ -1,7 +1,7 @@
 import { LocalStoreRepository } from "@/data/repository/localRepository";
 import { VehicleRepository } from "@/data/repository/VehiclesRepository";
 import { IRegisterVehicle } from "@/domain/entities/IVehicles";
-import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase"; // Asegúrate de importar el caso de uso
+import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
 import { IUser } from "../entities/IAuth";
 
 export class VehicleUseCases {

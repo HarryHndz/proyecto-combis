@@ -145,7 +145,7 @@ export default function RoutesCombi() {
       } else {
         console.warn('Ubicación actual no disponible');
       }
-    }, 10000);
+    }, 1000);
 
     return () => {
       clearInterval(intervalId);

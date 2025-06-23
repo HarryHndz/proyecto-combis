@@ -40,7 +40,9 @@ export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longi
 
   useEffect(()=>{
     if (latitudeCurrent && longitudeCurrent){
-      setValues({...values,latitude:latitudeCurrent,longitude:longitudeCurrent})
+      setValues(prevValues =>(
+        {...prevValues,latitude:latitudeCurrent,longitude:longitudeCurrent}
+      ))
     }
     if (openModal) {
       mapboxgl.accessToken = ACCESS_TOKEN
@@ -55,11 +57,11 @@ export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longi
           zoom:10.12,
         })
         mapRef.current.on('click',(e)=>{
-          setValues({
-            ...values,
+          setValues(prevValue =>({
+            ...prevValue,
             latitude:e.lngLat.lat,
             longitude:e.lngLat.lng
-          })   
+          }))   
       })},400)
       return()=>{
         clearTimeout(timeOut)
