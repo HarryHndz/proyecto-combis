@@ -13,13 +13,15 @@ export default function Home() {
   const mapRef = useRef<mapboxgl.Map>()
   const mapContainerRef = useRef<HTMLDivElement>()
   const combiMarkersRef = useRef<Record<string, mapboxgl.Marker>>({});
+  const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
+  const stopMarkersRef = useRef<mapboxgl.Marker[]>([]);
 
   const [search, setSearch] = useState<IRoute | null>(null)
   const [placesByRoute, setPlacesByRoute] = useState<IPlaceUpdate[]>([])
   const [userLocation, setUserLocation] = useState<{ lat: number, lng: number } | null>(null);
 
+  // Obtener ubicación del usuario
   useEffect(() => {
-    // Obtener ubicación actual del usuario
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
@@ -27,15 +29,9 @@ export default function Home() {
             lat: position.coords.latitude,
             lng: position.coords.longitude
           });
-
-          // Centrar el mapa en la ubicación del usuario
-          if (mapRef.current) {
-            mapRef.current.setCenter([position.coords.longitude, position.coords.latitude]);
-          }
         },
         (error) => {
           console.error("Error obteniendo ubicación:", error);
-          // Usar ubicación por defecto si falla
           setUserLocation({
             lat: 17.9753722,
             lng: -92.9465036
@@ -51,98 +47,137 @@ export default function Home() {
     }
   }, []);
 
+  // Inicialización del mapa (solo una vez)
   useEffect(() => {
-    if (!mapRef.current || !userLocation) return;
-    
-    const userMarker = new mapboxgl.Marker({ color: '#3FB1CE' })
-      .setLngLat([userLocation.lng, userLocation.lat])
-      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
-        <div style="color:rgb(10, 1, 83); font-weight: bold;">
-          Tu ubicación
-        </div>
-      `))
-      .addTo(mapRef.current);
-  
-    return () => {
-      userMarker.remove();
-    };
-  }, [userLocation]);
-
-  useEffect(() => {
-    mapboxgl.accessToken = ACCESS_TOKEN
+    mapboxgl.accessToken = ACCESS_TOKEN;
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       zoom: 10.20,
-      center: {
+      center: userLocation || {
         lat: 17.9753722,
         lng: -92.9465036,
       }
     });
-    if (placesByRoute.length > 0) {
-      placesByRoute.forEach((place) => {
-        new mapboxgl.Marker().setLngLat([place.longitude, place.latitude]).setPopup(
-          new mapboxgl.Popup({ offset: 25 }).setHTML(`
-            <div style="color:rgb(10, 1, 83); font-weight: bold;">
-              ${place.name} <br/>
-              <span style="font-size: 12px; color: #555;">Orden: ${place.order}</span>
-            </div>
-          `)
-        ).addTo(mapRef.current)
-      })
-    }
-    return () => {
-      mapRef.current.remove()
-    }
-  }, [placesByRoute])
 
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+      }
+    };
+  }, []);
+
+  // Actualizar centro del mapa cuando cambia la ubicación del usuario
+  useEffect(() => {
+    if (mapRef.current && userLocation) {
+      mapRef.current.setCenter([userLocation.lng, userLocation.lat]);
+    }
+  }, [userLocation]);
+
+  // Marcador del usuario
+  useEffect(() => {
+    if (!mapRef.current || !userLocation) return;
+    
+    // Eliminar marcador anterior si existe
+    if (userMarkerRef.current) {
+      userMarkerRef.current.remove();
+    }
+
+    // Crear nuevo marcador
+    userMarkerRef.current = new mapboxgl.Marker({ color: '#3FB1CE' })
+      .setLngLat([userLocation.lng, userLocation.lat])
+      .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
+        <div style="color:rgb(163, 12, 12); font-weight: bold;">
+          Tu ubicación
+        </div>
+      `))
+      .addTo(mapRef.current);
+
+    // Asegurar que el marcador del usuario esté siempre visible
+    if (userMarkerRef.current.getElement()) {
+      userMarkerRef.current.getElement().style.zIndex = '1000';
+    }
+
+    return () => {
+      if (userMarkerRef.current) {
+        userMarkerRef.current.remove();
+      }
+    };
+  }, [userLocation]);
+
+  // Marcadores de paradas
+  useEffect(() => {
+    if (!mapRef.current || placesByRoute.length === 0) return;
+
+    // Limpiar marcadores antiguos
+    stopMarkersRef.current.forEach(marker => marker.remove());
+    stopMarkersRef.current = [];
+
+    // Crear nuevos marcadores
+    placesByRoute.forEach((place) => {
+      const marker = new mapboxgl.Marker()
+        .setLngLat([place.longitude, place.latitude])
+        .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
+          <div style="color:rgb(0, 0, 0); font-weight: bold; font-color: rgb(0, 0, 0)">
+            ${place.name} <br/>
+            <span style="font-size: 12px; color: #000;">Orden: ${place.order}</span>
+          </div>
+        `))
+        .addTo(mapRef.current);
+      
+      stopMarkersRef.current.push(marker);
+    });
+  }, [placesByRoute]);
+
+  // Marcadores de combis
   useEffect(() => {
     if (!mapRef.current) return;
+    
     messages.forEach((msg) => {
       const { idCombi, longitude, latitude } = msg;
 
-      // Si ya existe el marcador, solo actualizamos su posición
       if (combiMarkersRef.current[idCombi]) {
         combiMarkersRef.current[idCombi].setLngLat([longitude, latitude]);
       } else {
-        // Si no existe, creamos uno nuevo y lo guardamos en el ref
-        const markerElement = createMarkerWithImage('/combi.jpg'); // ruta de tu imagen
+        const markerElement = createMarkerWithImage('/combi.jpg');
         const newMarker = new mapboxgl.Marker({ element: markerElement })
           .setLngLat([longitude, latitude])
           .setPopup(new mapboxgl.Popup({ offset: 25 }).setHTML(`
             <div style="color:rgb(10, 1, 83); font-weight: bold;">
               id de la combi ${idCombi} <br/>
             </div>
-          `)
-          ).addTo(mapRef.current);
+          `))
+          .addTo(mapRef.current);
 
         combiMarkersRef.current[idCombi] = newMarker;
       }
     });
   }, [messages]);
 
-
+  // Obtener paradas por ruta
   useEffect(() => {
     const getPlacesByRoute = async () => {
       try {
-        if (!search) return
-        const repository = new PlaceUseCases()
-        const response = await repository.getPlaceByRoute(search.id)
-        setPlacesByRoute(response)
-        console.log("response", response);
+        if (!search) return;
+        const repository = new PlaceUseCases();
+        const response = await repository.getPlaceByRoute(search.id);
+        setPlacesByRoute(response);
       } catch (error) {
         console.log("error", error);
-
       }
-    }
+    };
+    
     if (search) {
-      getPlacesByRoute()
+      getPlacesByRoute();
     }
-  }, [search])
+  }, [search]);
 
+  // Conexión MQTT
   useEffect(() => {
-    if (!search) return
+    if (!search) return;
+    
     const client = mqtt.connect('ws://6.tcp.us-cal-1.ngrok.io:17150');
-    setClient(client)
+    setClient(client);
+    
     client.on('connect', () => {
       console.log('🟢 Conectado al broker MQTT');
       client.subscribe(`ubicacion/ruta/${search.id}`, (err) => {
@@ -154,11 +189,8 @@ export default function Home() {
       });
     });
 
-    // Recibir mensajes
     client.on('message', (topic, message) => {
-      console.log(`📩 Mensaje recibido en ${topic}:`, message.toString());
-      const dataLocation = JSON.parse(message.toString())
-      console.log("aqui", dataLocation);
+      const dataLocation = JSON.parse(message.toString());
       setMessages((prevMessages) => {
         const existingIndex = prevMessages.findIndex(msg => msg.idCombi === dataLocation.idCombi);
         if (existingIndex !== -1) {
@@ -170,6 +202,7 @@ export default function Home() {
         }
       });
     });
+
     client.on('error', (err) => {
       console.error('🚨 Error MQTT:', err);
     });
@@ -189,11 +222,14 @@ export default function Home() {
     return el;
   };
 
-
   return (
     <div>
       <div style={{ position: 'relative', height: '100vh' }}>
-        <div id="map-container" ref={mapContainerRef} style={{ width: '100%', height: '100vh' }} />
+        <div 
+          id="map-container" 
+          ref={mapContainerRef} 
+          style={{ width: '100%', height: '100vh' }} 
+        />
         <MapCard
           setRouteValue={setSearch}
           routeValue={search}

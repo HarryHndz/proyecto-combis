@@ -1,7 +1,7 @@
 import { IPlace } from "@/domain/entities/IPlaces"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material"
 import { useState,useRef,useEffect, } from "react"
-import mapboxgl from 'mapbox-gl'
+//mport mapboxgl from 'mapbox-gl'
 import { ACCESS_TOKEN } from "../utils/constants"
 
 interface IPropsModalAddPlace {
