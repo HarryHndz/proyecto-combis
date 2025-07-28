@@ -1,7 +1,7 @@
 import { IPlace } from "@/domain/entities/IPlaces"
 import { Button, Dialog, DialogActions, DialogContent, DialogTitle, TextField, Typography } from "@mui/material"
 import { useState,useRef,useEffect, } from "react"
-//mport mapboxgl from 'mapbox-gl'
+import mapboxgl from 'mapbox-gl'
 import { ACCESS_TOKEN } from "../utils/constants"
 
 interface IPropsModalAddPlace {
@@ -14,8 +14,8 @@ interface IPropsModalAddPlace {
 
 export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longitudeCurrent}:IPropsModalAddPlace)=>{
   const [openModal,setOpenModal] = useState<boolean>(false)
-  const mapRef = useRef<mapboxgl.Map>()
-  const mapContainerRef = useRef<HTMLDivElement>()
+  const mapRef = useRef<mapboxgl.Map>(null)
+  const mapContainerRef = useRef<HTMLDivElement>(null)
   const [values,setValues] = useState<IPlace>({
     latitude:latitudeCurrent ?? -12.047890,
     longitude:longitudeCurrent ?? -77.043456,
@@ -48,7 +48,7 @@ export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longi
       mapboxgl.accessToken = ACCESS_TOKEN
       const timeOut = setTimeout(()=>{
         mapRef.current = new mapboxgl.Map({
-          container: mapContainerRef.current,
+          container: mapContainerRef.current ?? '',
           style:'mapbox://styles/mapbox/streets-v11',
           center:{
             lat:values.latitude,
@@ -65,11 +65,11 @@ export const ModalAddPlace =  ({places,setPlaces,handleAdd,latitudeCurrent,longi
       })},400)
       return()=>{
         clearTimeout(timeOut)
-        mapRef.current.remove()
+         mapRef.current?.remove()
       }
     }
 
-  },[openModal,latitudeCurrent,longitudeCurrent])
+  },[openModal,latitudeCurrent,longitudeCurrent,values.latitude,values.longitude])
   
   return(
     <>

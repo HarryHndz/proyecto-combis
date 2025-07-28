@@ -6,6 +6,10 @@ export class PlaceRepository implements PlaceInterface{
   constructor(){
     this.httpClient = new ApiClient().getInstance()
   }
+  updatePlace(dataPlace: IRoutePlaceAdd): Promise<IRoutePlaceAdd> {
+    console.log(dataPlace)
+    throw new Error("Method not implemented.");
+  }
   async getPlaceByRoute(id:number): Promise<IPlaceUpdate[]> {
     try {
       const {data} =await this.httpClient.get(`rutas-paradas-orden/${id}/paradas`)
@@ -101,8 +105,5 @@ export class PlaceRepository implements PlaceInterface{
     }
 
   }
-  async updatePlace(dataPlace: IRoutePlaceAdd): Promise<IRoutePlaceAdd> {
-
-    throw new Error("Method not implemented.");
-  }
+  
 }

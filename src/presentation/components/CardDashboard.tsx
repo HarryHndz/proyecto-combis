@@ -74,7 +74,7 @@ const MapCard = ({ setRouteValue, routeValue, messages, userLocation }: PropsMap
 						isOptionEqualToValue={(option, value) => option.name === value.name}
 						getOptionKey={(option) => option.id}
 						value={routeValue}
-						onChange={(event, newValue) => {
+						onChange={(_event, newValue) => {
 							setRouteValue(newValue)
 							console.log("cambio", newValue);
 

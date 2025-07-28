@@ -10,8 +10,8 @@ import MapCard from "@/presentation/components/CardDashboard";
 export default function Home() {
   const [client, setClient] = useState<mqtt.MqttClient | null>(null);
   const [messages, setMessages] = useState<any[]>([]);
-  const mapRef = useRef<mapboxgl.Map>()
-  const mapContainerRef = useRef<HTMLDivElement>()
+  const mapRef = useRef<mapboxgl.Map>(null)
+  const mapContainerRef = useRef<HTMLDivElement>(null)
   const combiMarkersRef = useRef<Record<string, mapboxgl.Marker>>({});
   const userMarkerRef = useRef<mapboxgl.Marker | null>(null);
   const stopMarkersRef = useRef<mapboxgl.Marker[]>([]);
@@ -51,7 +51,7 @@ export default function Home() {
   useEffect(() => {
     mapboxgl.accessToken = ACCESS_TOKEN;
     mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
+      container: mapContainerRef.current ?? '',
       zoom: 10.20,
       center: userLocation || {
         lat: 17.9753722,
@@ -64,7 +64,7 @@ export default function Home() {
         mapRef.current.remove();
       }
     };
-  }, []);
+  }, [userLocation]);
 
   // Actualizar centro del mapa cuando cambia la ubicación del usuario
   useEffect(() => {
@@ -122,7 +122,7 @@ export default function Home() {
             <span style="font-size: 12px; color: #000;">Orden: ${place.order}</span>
           </div>
         `))
-        .addTo(mapRef.current);
+        .addTo(mapRef.current as mapboxgl.Map);
       
       stopMarkersRef.current.push(marker);
     });
@@ -146,7 +146,7 @@ export default function Home() {
               id de la combi ${idCombi} <br/>
             </div>
           `))
-          .addTo(mapRef.current);
+          .addTo(mapRef.current as mapboxgl.Map)
 
         combiMarkersRef.current[idCombi] = newMarker;
       }
@@ -189,7 +189,7 @@ export default function Home() {
       });
     });
 
-    client.on('message', (topic, message) => {
+    client.on('message', (_, message) => {
       const dataLocation = JSON.parse(message.toString());
       setMessages((prevMessages) => {
         const existingIndex = prevMessages.findIndex(msg => msg.idCombi === dataLocation.idCombi);
@@ -221,6 +221,8 @@ export default function Home() {
     el.style.backgroundRepeat = 'no-repeat';
     return el;
   };
+
+  console.log("client", client);
 
   return (
     <div>

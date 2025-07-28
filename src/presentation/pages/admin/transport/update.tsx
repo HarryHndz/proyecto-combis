@@ -24,9 +24,9 @@ const UpdateVehiculoForm = () => {
       const vehicle = vehicles.find((v) => v.id === id);
       if (vehicle) {
         setFormData({
-          numero: vehicle.numero,
-          matricula: vehicle.matricula,
-          image: typeof vehicle.image === "string" ? vehicle.image : "",
+          numero: vehicle.numero ?? '',
+          matricula: vehicle.matricula ?? '',
+          image: "",
         });
       }
     }

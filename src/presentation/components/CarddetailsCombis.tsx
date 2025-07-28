@@ -12,7 +12,7 @@ const VehicleDetailsCard: React.FC<VehicleDetailsCardProps> = ({ vehicle }) => {
       <CardMedia
         component="img"
         height="300"
-        image={vehicle.image ? URL.createObjectURL(vehicle.image) : '/placeholder-image.jpg'}
+        image='/placeholder-image.jpg'
         alt={`Imagen de ${vehicle.numero}`}
       />
       <CardContent>

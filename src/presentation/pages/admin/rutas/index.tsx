@@ -15,10 +15,8 @@ import { IDriverCar } from "@/domain/entities/IDriverCar";
 
 export default function RoutesCombi() {
   const [client, setClient] = useState<mqtt.MqttClient | null>(null);
-  const mapRef = useRef<mapboxgl.Map>();
-  const mapContainerRef = useRef<HTMLDivElement>();
-  const adminRepository = new AdminUseCases(new AdminRepository);
-  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
+  const mapRef = useRef<mapboxgl.Map>(null);
+  const mapContainerRef = useRef<HTMLDivElement>(null);
   const [data, setData] = useState<IDriverCar>();
 
   const [currentLocation, setCurrentLocation] = useState<{ latitude: number, longitude: number } | null>(null);
@@ -26,6 +24,8 @@ export default function RoutesCombi() {
 
   useEffect(() => {
     const fetchData = async () => {
+      const adminRepository = new AdminUseCases(new AdminRepository);
+      const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
       const userLocal = localRepository.get('user')
       const user = await adminRepository.getDataDriverCar(Number(userLocal?.id))
       setData(user)
@@ -39,7 +39,7 @@ export default function RoutesCombi() {
   useEffect(() => {
     mapboxgl.accessToken = ACCESS_TOKEN;
     mapRef.current = new mapboxgl.Map({
-      container: mapContainerRef.current,
+      container: mapContainerRef.current ?? '',
       zoom: 10.20,
       center: {
         lat: 17.9753722,
@@ -48,16 +48,16 @@ export default function RoutesCombi() {
 
     });
 
-    if (placesByRoute.length > 0) {
+    if (placesByRoute.length > 0 && mapRef.current) {
       placesByRoute.forEach((place) => {
         new mapboxgl.Marker().setLngLat([place.longitude, place.latitude]).setPopup(
           new mapboxgl.Popup({ offset: 25 }).setText(`${place.name} (Orden: ${place.order})`)
-        ).addTo(mapRef.current)
+        ).addTo(mapRef.current as mapboxgl.Map);
       });
     }
 
     return () => {
-      mapRef.current.remove();
+      mapRef.current?.remove();
     }
   }, [placesByRoute]);
 
@@ -135,27 +135,12 @@ export default function RoutesCombi() {
     }
   }, []);
 
+    
+
   // Enviar ubicación cada 10 segundos
   useEffect(() => {
     if (!client || !search) return;
-
-    const intervalId = setInterval(() => {
-      if (currentLocation) {
-        handlePublish();
-      } else {
-        console.warn('Ubicación actual no disponible');
-      }
-    }, 1000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
-  }, [client, search, currentLocation]);
-
-
-
-
-  const handlePublish = () => {
+    const handlePublish = () => {
     if (client && search && currentLocation) {
       console.log('🟢 Publicando ubicación...', currentLocation);
       const locationData = {
@@ -171,6 +156,24 @@ export default function RoutesCombi() {
     }
   };
 
+    const intervalId = setInterval(() => {
+      if (currentLocation) {
+        handlePublish();
+      } else {
+        console.warn('Ubicación actual no disponible');
+      }
+    }, 1000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+  }, [client, search, currentLocation, data]);
+  
+
+
+
+  console.log("locationId", locationWatchId);
+
   return (
     <div>
       <div style={{ position: 'relative', height: '100vh' }}>
@@ -178,6 +181,8 @@ export default function RoutesCombi() {
         <MapCard
           setRouteValue={setSearch}
           routeValue={search}
+          messages={[]}
+          userLocation={{ lat: currentLocation?.latitude ?? 0, lng: currentLocation?.longitude ?? 0 }}
         />
       </div>
     </div>
