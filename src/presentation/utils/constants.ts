@@ -28,7 +28,7 @@ const USERS:IValues<IUserType>[] = [
   },
 ]
 
-const URL_SERVER = 'https://vwwrmpcj-3000.usw3.devtunnels.ms/'
+const URL_SERVER = 'https://xc0dx0dn-3000.usw3.devtunnels.ms/'
 const ACCESS_TOKEN = 'pk.eyJ1IjoiaGFycnloZHplMSIsImEiOiJjbTk2OGU3b2gxZnZjMmtvaHJxM3VzZ3diIn0.5GBNaTKCKTgtxd_JmKG31A'
 
 export {

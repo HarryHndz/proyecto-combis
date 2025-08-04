@@ -25,7 +25,6 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<RootRedirect />} />
-
         <Route path="user" element={<DashboardUserLayout />}>
           <Route path="home" index element={<Home />} />
           <Route path="account" element={<Account />} />

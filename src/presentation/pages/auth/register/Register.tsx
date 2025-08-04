@@ -94,11 +94,7 @@ export default function Register() {
             p: 3,
           }}
         >
-          <img
-            src="@/../../public/perfil.png"
-            alt="Registro"
-            style={{ width: "100%", maxWidth: 300, borderRadius: "16px" }}
-          />
+          
         </Box>
 
         <Box sx={{ flex: 2, p: { xs: 3, sm: 4 } }}>

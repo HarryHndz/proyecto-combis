@@ -16,9 +16,9 @@ const AuthContext = createContext<AuthContextType>(null!);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<IUser | null>(null);
   const [loading, setLoading] = useState(true);
-  const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
-
+  
   useEffect(() => {
+    const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
     const storedUser = localRepository.get('user');
     console.log('En el AuthContext', storedUser);
     if (storedUser) {
@@ -26,6 +26,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setUser(storedUser);
 
       } catch (error) {
+        console.error('Error al obtener el usuario del LocalStorage', error);
         localRepository.remove('user');
       }
     }
@@ -37,15 +38,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const logout = () => {
+    const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
     setUser(null);
     localRepository.remove('user')
   };
 
   const redirectBasedOnAuth = (): string => {
     if (user) {
-      return '/admin/';
+      return '/admin/'
     }
-    return '/user/';
+    return '/auth/login';
   };
 
   if (loading) {
