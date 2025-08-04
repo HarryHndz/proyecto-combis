@@ -6,17 +6,16 @@ import {
   Box,
   Button,
   Typography,
-  Link,
   Alert,
   CircularProgress,
 } from "@mui/material";
 import validationSchema from "@/domain/validation/loginValidation";
 import { FormField } from "@/presentation/components/FormField";
-import { useNavigate } from "react-router";
+import { useNavigate,Link } from "react-router";
 import { LocalStoreRepository } from "@/data/repository/localRepository";
 import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
 import { useState } from "react";
-import { useAuth } from "@/domain/validation/AuthContext";
+// import { useAuth } from "@/domain/validation/AuthContext";
 
 export default function Login() {
   const initialValues: ISession = {
@@ -28,14 +27,14 @@ export default function Login() {
   const navigate = useNavigate();
   const authRepository = new AuthUseCases(new AuthRepository());
   const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
-  const { login } = useAuth();
+  // const { login } = useAuth();
 
   const onSubmit = async (values: ISession) => {
     setLoginError("");
     try {
       const response = await authRepository.login(values);
       localRepository.save("user", response);
-      login(response);
+      // login(response);
       navigate("/admin/");
     } catch (error: any) {
       setLoginError("Credenciales incorrectas o error en el servidor.");
@@ -125,11 +124,14 @@ export default function Login() {
         <Box sx={{ display: "flex", justifyContent: "center", mt: 2 }}>
           <Typography variant="body2">
             ¿No tienes cuenta?{" "}
-            <Link href="/auth/register" underline="hover" color="error">
+            <Link to='/auth/register'>
               Registrarse
             </Link>
           </Typography>
         </Box>
+        <Link to='/user/home' replace>
+          home
+        </Link>
       </Box>
     </Box>
   );

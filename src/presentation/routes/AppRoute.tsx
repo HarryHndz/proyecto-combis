@@ -1,4 +1,4 @@
-import { BrowserRouter, Navigate, Route, Routes } from "react-router";
+import { BrowserRouter, Route, Routes } from "react-router";
 import Login from "@/presentation/pages/auth/login/Login";
 import Register from "@/presentation/pages/auth/register/Register";
 import Profile from "@/presentation/pages/user/profile/Profile";
@@ -55,12 +55,50 @@ const Router = () => {
           <Route path="register" element={<Register />} />
           <Route index path="login" element={<Login />} />
         </Route>
-
-        <Route path="*" element={<Navigate to="/" replace />} />
-
       </Routes>
     </BrowserRouter>
   );
 };
 
 export default Router;
+
+
+
+// <BrowserRouter>
+//       <Routes>
+//         <Route index element={<RootRedirect />} />
+//         <Route path="user" element={<DashboardUserLayout />}>
+//           <Route path="home" index element={<Home />} />
+//           <Route path="account" element={<Account />} />
+//           <Route path="profile" element={<Profile />} />
+//         </Route>
+//         <Route element={<ProtectedRoute allowedRoles={[1, 2, 3, 4]} />}>
+//           <Route path="admin" element={<DasboardAdminLayout />}>
+//             <Route path="places">
+//               <Route index element={<Places />} />
+//               <Route path="add" index element={<AddPlace />} />
+//             </Route>
+//             <Route path="transport">
+//               <Route path="update" element={<UpdateCombis />} />
+//               <Route path="details/:id" element={<DetailsCombis />} />
+//               <Route index element={<Transport />} />
+//             </Route>
+//             <Route path="drivers">
+//               <Route index element={<Drivers />} />
+//               <Route path="new" index element={<AddDriver />} />
+//               <Route path="modify/:id" index element={<UpdateDriver />} />
+//               <Route path="details/:userId" index element={<DetailsDriver />} />
+//             </Route>
+//             <Route path="routes" element={<RoutesCombi />} />
+//             <Route path="account" index element={<UserProfile />}></Route>
+//           </Route>
+//         </Route>
+//         <Route path="auth">
+//           <Route path="register" element={<Register />} />
+//           <Route index path="login" element={<Login />} />
+//         </Route>
+
+//         <Route path="*" element={<Navigate to="/" replace />} />
+
+//       </Routes>
+//     </BrowserRouter>

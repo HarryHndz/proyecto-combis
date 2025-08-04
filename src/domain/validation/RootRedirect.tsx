@@ -5,5 +5,8 @@ export const RootRedirect = () => {
   const { redirectBasedOnAuth } = useAuth();
   const redirectTo = redirectBasedOnAuth();
 
-  return <Navigate to={redirectTo} replace />;
+  if (redirectTo) {
+    return <Navigate to="/admin/" replace />;
+  }
+  return <Navigate to="/auth/login" replace />;
 };

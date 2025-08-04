@@ -8,7 +8,7 @@ interface AuthContextType {
   login: (user: IUser) => void;
   logout: () => void;
   loading: boolean;
-  redirectBasedOnAuth: () => string;
+  redirectBasedOnAuth: () => boolean;
 }
 
 const AuthContext = createContext<AuthContextType>(null!);
@@ -43,11 +43,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     localRepository.remove('user')
   };
 
-  const redirectBasedOnAuth = (): string => {
+  const redirectBasedOnAuth = (): boolean => {
     if (user) {
-      return '/admin'
+      return true
     }
-    return '/auth/login';
+    return false
   };
 
   if (loading) {

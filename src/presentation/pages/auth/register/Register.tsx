@@ -227,7 +227,7 @@ export default function Register() {
                 variant="outlined"
                 color="error"
                 fullWidth
-                onClick={() => navigate("/auth/login")}
+                onClick={() => navigate("/")}
               >
                 Iniciar sesión
               </Button>
