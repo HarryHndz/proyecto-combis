@@ -12,7 +12,7 @@ import {
 } from "@mui/material";
 import validationSchema from "@/domain/validation/loginValidation";
 import { FormField } from "@/presentation/components/FormField";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { LocalStoreRepository } from "@/data/repository/localRepository";
 import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
 import { useState } from "react";

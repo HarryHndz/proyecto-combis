@@ -1,6 +1,6 @@
 import { useAuth } from "@/domain/validation/AuthContext";
 import { Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function Profile(){
   const authUser = useAuth()

@@ -14,7 +14,7 @@ import { InputSelect } from "@/presentation/components/InputSelect";
 import { SEX, USERS } from "@/presentation/utils/constants";
 import { AuthRepository } from "@/data/repository/authRepository";
 import { AuthUseCases } from "@/domain/useCases/authUseCases";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function Register() {
   const authRepository = new AuthUseCases(new AuthRepository());

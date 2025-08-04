@@ -9,7 +9,7 @@ import { useFormikForm } from "@/presentation/hooks/useFormikValues";
 import DeleteIcon from '@mui/icons-material/Delete';
 import placeValidation from "@/domain/validation/placesValidation";
 import { PlaceUseCases } from "@/domain/useCases/placeUseCases";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 
 export default function AddPlace() {
   const router = useNavigate()

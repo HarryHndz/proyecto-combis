@@ -8,7 +8,7 @@ import {
   MenuList,
   MenuItem
 } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import TuneIcon from '@mui/icons-material/Tune';
 import ListItemText from '@mui/material/ListItemText';
 import ListItemIcon from '@mui/material/ListItemIcon';

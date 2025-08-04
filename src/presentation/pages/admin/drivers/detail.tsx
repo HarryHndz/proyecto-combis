@@ -17,7 +17,7 @@ import {
 } from "@mui/material"
 import { Person, Badge, CalendarMonth, Email, Info } from "@mui/icons-material"
 import { IUserResData } from "@/domain/entities/IUserRes"
-import { useParams } from "react-router-dom";
+import { useParams } from "react-router";
 import { AdminUseCases } from "@/domain/useCases/adminUseCases";
 import { AdminRepository } from "@/data/repository/adminRepository";
 import { useEffect, useState } from "react";

@@ -23,7 +23,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import AddIcon from "@mui/icons-material/Add";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { AdminUseCases } from "@/domain/useCases/adminUseCases";
 import { AdminRepository } from "@/data/repository/adminRepository";
 import { IDrivePerson } from "@/domain/entities/IDriver";

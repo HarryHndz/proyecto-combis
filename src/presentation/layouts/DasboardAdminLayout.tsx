@@ -2,7 +2,7 @@ import { createTheme } from '@mui/material/styles';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import { type Navigation } from '@toolpad/core/AppProvider';
 import { DashboardLayout } from '@toolpad/core/DashboardLayout';
-import { Outlet } from 'react-router-dom';
+import { Outlet } from 'react-router';
 import { ReactRouterAppProvider } from '@toolpad/core/react-router';
 import DirectionsCarIcon from '@mui/icons-material/DirectionsCar';
 import PlaceIcon from '@mui/icons-material/Place';

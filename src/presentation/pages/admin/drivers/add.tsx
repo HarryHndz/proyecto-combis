@@ -1,7 +1,7 @@
 import { useFormikForm } from "@/presentation/hooks/useFormikValues";
 import { Box, Button, Divider, Paper, Stack, Typography } from "@mui/material";
 import validationSchema from "@/domain/validation/driverRegister";
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { FormField } from "@/presentation/components/FormField";
 import { InputSelect } from "@/presentation/components/InputSelect";
 import { SEX } from "@/presentation/utils/constants";

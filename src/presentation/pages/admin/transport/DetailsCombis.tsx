@@ -12,7 +12,7 @@ import {
 import {
   useParams,
   useNavigate
-} from 'react-router-dom';
+} from 'react-router';
 import { useEffect, useState } from 'react';
 import useVehiclesData from '@/presentation/hooks/useVehiclesData';
 import EditRouteComponent from '@/presentation/components/selectupdate';
