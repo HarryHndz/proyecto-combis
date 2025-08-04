@@ -45,7 +45,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const redirectBasedOnAuth = (): string => {
     if (user) {
-      return '/admin/'
+      return '/admin'
     }
     return '/auth/login';
   };
