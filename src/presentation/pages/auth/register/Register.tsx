@@ -41,7 +41,7 @@ export default function Register() {
       console.log("Valores del formulario", values);
       const data = await authRepository.register(values);
       console.log("Registro exitoso", data);
-      navigate("auth/login");
+      navigate("/auth/login");
     } catch (error) {
       console.error(error);
     }
@@ -227,7 +227,7 @@ export default function Register() {
                 variant="outlined"
                 color="error"
                 fullWidth
-                onClick={() => navigate("/")}
+                onClick={() => navigate("/auth/login")}
               >
                 Iniciar sesión
               </Button>
