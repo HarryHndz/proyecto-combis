@@ -15,7 +15,7 @@ import { useNavigate,Link } from "react-router";
 import { LocalStoreRepository } from "@/data/repository/localRepository";
 import { LocalStoreUseCase } from "@/domain/useCases/localStoreUseCase";
 import { useState } from "react";
-// import { useAuth } from "@/domain/validation/AuthContext";
+import { useAuth } from "@/domain/validation/AuthContext";
 
 export default function Login() {
   const initialValues: ISession = {
@@ -27,14 +27,14 @@ export default function Login() {
   const navigate = useNavigate();
   const authRepository = new AuthUseCases(new AuthRepository());
   const localRepository = new LocalStoreUseCase<IUser>(new LocalStoreRepository());
-  // const { login } = useAuth();
+  const { login } = useAuth();
 
   const onSubmit = async (values: ISession) => {
     setLoginError("");
     try {
       const response = await authRepository.login(values);
       localRepository.save("user", response);
-      // login(response);
+      login(response);
       navigate("/admin/");
     } catch (error: any) {
       setLoginError("Credenciales incorrectas o error en el servidor.");
